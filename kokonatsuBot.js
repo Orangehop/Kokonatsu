@@ -131,6 +131,20 @@ function messageHandler(msg){
     if(command[0].toLowerCase() != 'k'){
         return;
     }
-
-    request.post({"url": "https://discordapp.com/api/channels/"+msg.channel_id+"/messages", "headers": AuthHeaders, json: {content: command[1]}});
+    
+    command = msg.content.split(' ');
+    
+    if(command[0] == "k!echo")
+    {
+       
+        request.post({"url": "https://discordapp.com/api/channels/"+msg.channel_id+"/messages", "headers": AuthHeaders, json: {content: command[1]}});
+    }
+    
+    if(command[0] == "k!gif")
+    {
+        request.get({"url": "http://api.giphy.com/v1/gifs/random?api_key=dc6zaTOxFJmzC&tag="+command[1]}, function(err, res, body)
+        {
+            request.post({"url": "https://discordapp.com/api/channels/"+msg.channel_id+"/messages", "headers": AuthHeaders, json: {content: JSON.parse(body).data.url}});
+        });
+    }
 }
