@@ -1,5 +1,6 @@
-// var mongoose = require('mongoose');
-// mongoose.connect('mongodb://localhost/');
+var mongodb = require('mongodb');
+var MongoClient = mongodb.MongoClient;
+var dbUrl = 'mongodb://localhost:27017/kokonatsu';
 
 var request = require('request');
 
@@ -127,24 +128,63 @@ function eventHandler(eventName, d){
 
 function messageHandler(msg){
     console.log(msg);
-    var command = msg.content.split('!');
-    if(command[0].toLowerCase() != 'k'){
-        return;
-    }
-    
-    command = msg.content.split(' ');
-    
-    if(command[0] == "k!echo")
-    {
-       
-        request.post({"url": "https://discordapp.com/api/channels/"+msg.channel_id+"/messages", "headers": AuthHeaders, json: {content: command[1]}});
-    }
-    
-    if(command[0] == "k!gif")
-    {
-        request.get({"url": "http://api.giphy.com/v1/gifs/random?api_key=dc6zaTOxFJmzC&tag="+command[1]}, function(err, res, body)
-        {
-            request.post({"url": "https://discordapp.com/api/channels/"+msg.channel_id+"/messages", "headers": AuthHeaders, json: {content: JSON.parse(body).data.url}});
+
+    var getGuildPromise = new Promise(function(resolve, reject){
+        request.get({"url": "https://discordapp.com/api/channels/"+msg.channel_id, "headers": AuthHeaders}, function(err, res, body){
+            body = JSON.parse(body);
+            resolve(body.guild_id);
         });
-    }
+    });
+
+    getGuildPromise.then(function(guildID){
+        var splitter = msg.content.split('!');
+        var reply;
+        if(splitter[0] != 'k'){console.log("not a command"); return;}
+        var command = splitter[1].split(' ');
+        if(command[0] == 'macro'){
+            console.log("begin logging macro");
+            if(command.length != 3){
+                reply = "error: macro command is k!macro <macro name> <macro text>";
+                request.post({"url": "https://discordapp.com/api/channels/"+msg.channel_id+"/messages", "headers": AuthHeaders, json: {content: reply}});
+            }
+            else{
+                MongoClient.connect(dbUrl, function (err, db) {
+                    if (err) {
+                        console.log('Unable to connect to the mongoDB server. Error:', err);
+                    } else {
+                        //HURRAY!! We are connected. :)
+                        console.log('Connection established to', dbUrl);
+
+                        db.collection('Macros', function(err, macros){
+                            macros.insertOne({guild: guildID, macro: command[1], text: command[2]});
+                            reply = "inserted macro "+command[1]+" "+command[2];
+                            request.post({"url": "https://discordapp.com/api/channels/"+msg.channel_id+"/messages", "headers": AuthHeaders, json: {content: reply}});
+                        });
+
+                        //Close connection
+                        db.close();
+                    }
+                });
+            }
+        }
+        else if(command.length == 1){
+            MongoClient.connect(dbUrl, function (err, db) {
+                if (err) {
+                    console.log('Unable to connect to the mongoDB server. Error:', err);
+                } else {
+                    //HURRAY!! We are connected. :)
+                    console.log('Connection established to', dbUrl);
+
+                    db.collection('Macros', function(err, macros){
+                        macros.findOne({guild: {$eq: guildID}, macro: {$eq: command[0]} }, function(err, macro){
+                            request.post({"url": "https://discordapp.com/api/channels/"+msg.channel_id+"/messages", "headers": AuthHeaders, json: {content: macro.text}});
+                        });
+                    });
+
+                    //Close connection
+                    db.close();
+                }
+            });
+        }
+    });
 }
