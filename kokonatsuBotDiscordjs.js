@@ -3,7 +3,7 @@ var request = require('request');
 
 var mongodb = require('mongodb');
 var MongoClient = mongodb.MongoClient;
-var dbUrl = 'mongodb://localhost:27017/kokonatsu';
+var dbUrl = 'mongodb://admin:password@ds047612.mlab.com:47612/kokonatsu';
 
 var bot = new Discord.Client();
 
