@@ -51,11 +51,14 @@ bot.on("message", msg => {
                             }
                             else{
                                 macros.insertOne({guild: guildID, macro: tags[1], text: tags[2]}, function(err, res){
-                                    console.log(err);
-                                    console.log(res);
+                                    if(err){
+                                        console.log(err);
+                                    }
+                                    else{
+                                        msg.channel.sendMessage("Inserted macro "+tags[1]+" "+tags[2]);
+                                    }
                                     db.close();
                                 });
-                                msg.channel.sendMessage("Inserted macro "+tags[1]+" "+tags[2]);
                             }
                         });
                     });
