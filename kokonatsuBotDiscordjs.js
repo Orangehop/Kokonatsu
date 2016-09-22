@@ -17,7 +17,7 @@ var botCommands = require('./botCommands');
 var bot = new Discord.Client();
 
 bot.on("message", msg => {
-    let prefix = "kdev!";
+    let prefix = "k!";
     if(!msg.content.startsWith(prefix)){ if(!msg.content.startsWith('/')) return;}
     if(msg.author.bot) return;
     console.log(msg.content);
