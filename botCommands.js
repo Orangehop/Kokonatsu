@@ -5,7 +5,8 @@ var macro = function(msg, tags, MongoClient, dbUrl){
         MongoClient.connect(dbUrl, function (err, db) {
             if (err) {
                 console.log('Unable to connect to the mongoDB server. Error:', err);
-            } else {
+            }
+            else {
                 console.log("connected to db");
                 db.collection('Macros', function(err, macros){
                     macros.findOne({guild: {$eq: guildID}, macro: {$eq: tags[1]} }, function(err, macro){
@@ -51,7 +52,8 @@ var macro = function(msg, tags, MongoClient, dbUrl){
         MongoClient.connect(dbUrl, function (err, db) {
             if (err) {
                 console.log('Unable to connect to the mongoDB server. Error:', err);
-            } else {
+            }
+            else {
                 db.collection('Macros', function(err, macros){
                     macros.findOneAndDelete({guild: {$eq: guildID}, macro: {$eq: tags[1]} }, function(err, res){
                         let macro = res.value;
@@ -65,22 +67,31 @@ var macro = function(msg, tags, MongoClient, dbUrl){
             }
         });
     }
-    else if(tags.length == 1) {
-        MongoClient.connect(dbUrl, function (err, db) {
-            if (err) {
-                console.log('Unable to connect to the mongoDB server. Error:', err);
-            } else {
-                db.collection('Macros', function(err, macros){
-                    macros.findOne({guild: {$eq: guildID}, macro: {$eq: tags[0]} }, function(err, macro){
-                        msg.channel.sendMessage(macro.text);
-
-                        db.close();
-                    });
-                });
-            }
-        });
-    }
 };
+
+var quickMacro = function(msg, tag, MongoClient, dbUrl){
+    let guildID = msg.channel.guild.id;
+    console.log(tag);
+
+    MongoClient.connect(dbUrl, function (err, db) {
+        if (err) {
+            console.log('Unable to connect to the mongoDB server. Error:', err);
+        }
+        else {
+            db.collection('Macros', function(err, macros){
+                macros.findOne({guild: {$eq: guildID}, macro: {$eq: tag} }, function(err, macro){
+                    if(macro == null){
+                        msg.channel.sendMessage(tag+' does not exist');
+                    }
+                    else{
+                        msg.channel.sendMessage(macro.text);
+                    }
+                    db.close();
+                });
+            });
+        }
+    });
+}
 
 var echo = function(msg){
     var args = msg.content.substr(msg.content.indexOf(" ")+1);
@@ -95,4 +106,5 @@ var gif = function(msg, tags, request){
 };
 
 module.exports.macro = macro;
+module.exports.quickMacro = quickMacro;
 module.exports.echo = echo;
