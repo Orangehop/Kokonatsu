@@ -18,7 +18,7 @@ var bot = new Discord.Client();
 
 bot.on("message", msg => {
     let prefix = "k!";
-    if(!msg.content.startsWith(prefix)){ if(!msg.content.startsWith('`')) return;}
+    if(!msg.content.startsWith(prefix)){ if(!msg.content.startsWith('/')) return;}
     if(msg.author.bot) return;
     console.log(msg.content);
 
@@ -33,7 +33,7 @@ bot.on("message", msg => {
     else if(msg.content.startsWith(prefix+"macro")) {
         botCommands.macro(msg, tags, MongoClient, dbUrl);
     }
-    else if(msg.content.startsWith('`') && msg.content.indexOf(" ") == -1){
+    else if(msg.content.startsWith('/') && msg.content.indexOf(" ") == -1){
         botCommands.quickMacro(msg, msg.content.substr(1), MongoClient, dbUrl);
     }
 });
