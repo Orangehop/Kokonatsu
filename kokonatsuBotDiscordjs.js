@@ -12,33 +12,40 @@ var request = require('request');
 var mongodb = require('mongodb');
 var MongoClient = mongodb.MongoClient;
 var dbUrl = 'mongodb://admin:password@ds047612.mlab.com:47612/kokonatsu';
-//var dbUrl = 'mongodb://localhost:27017';
+var macrosConnected = MongoClient.connect(dbUrl).then(function(db){
+    return db.collection('Macros');
+});
 
 var botCommands = require('./botCommands');
 var bot = new Discord.Client();
 
 bot.on("message", msg => {
     let prefix = "k!";
-    if(!msg.content.startsWith(prefix)) return;
-    if(msg.author.bot) return;
+    var command;
+    if(!msg.content.startsWith(prefix) || msg.author.bot || msg.content.length <= prefix.length) return;
+    else command = msg.content.split("!")[1].split(" ")[0];
     console.log(msg.content);
+    console.log(command);
+
 
     var tags = msg.content.substr(msg.content.indexOf(" ")+1).split(" ");
-    var quickMacroTags = msg.content.substr(msg.content.indexOf(prefix)+2).split(" ");
-    
-    console.log(quickMacroTags);
-    
-    if (msg.content.startsWith(prefix+"echo")) {
+    var quickMacroTags = msg.content.substr(msg.content.indexOf(prefix)+prefix.length).split(" ");
+
+    if (command == "echo") {
         botCommands.echo(msg);
     }
-    else if(msg.content.startsWith(prefix+"gif")) {
+    else if(command == "gif") {
         botCommands.gif(msg, tags, request);
     }
-    else if(msg.content.startsWith(prefix+"macro")) {
-        botCommands.macro(msg, tags, MongoClient, dbUrl);
+    else if(command == "macro") {
+        macrosConnected.then(function(macros){
+            botCommands.macro(msg, tags, macros);
+        });
     }
-    else if(msg.content.startsWith(prefix)){
-        botCommands.quickMacro(msg, quickMacroTags, MongoClient, dbUrl);
+    else{
+        macrosConnected.then(function(macros){
+            botCommands.quickMacro(msg, quickMacroTags, macros);
+        });
     }
 });
 
