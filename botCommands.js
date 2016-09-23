@@ -1,8 +1,8 @@
 var macro = function (msg, tags, macros) {
-    tags[1] = tags[1].toLowerCase();
     let guildID = msg.channel.guild.id;
     console.log(tags);
     if (tags[0] == "add" && tags.length == 3) {
+        tags[1] = tags[1].toLowerCase();
         macros.findOneAndUpdate({
             guild: guildID,
             macro: tags[1]
