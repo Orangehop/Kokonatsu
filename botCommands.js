@@ -2,11 +2,6 @@ var macro = function(msg, tags, MongoClient, dbUrl){
     let guildID = msg.channel.guild.id;
     console.log(tags);
     if(tags[0] == "add" && tags.length == 3) {
-        var bannedWords = ["gamerscape", "xivdb", "giphy", "tenor", "tts", "me", "tableflip", "unflip", "shrug"];
-        if(bannedWords.indexOf(tags[1]) != -1){
-            msg.channel.sendMessage(tags[1]+" is already a discord command");
-            return;
-        }
         MongoClient.connect(dbUrl, function (err, db) {
             if (err) {
                 console.log('Unable to connect to the mongoDB server. Error:', err);
@@ -113,3 +108,4 @@ var gif = function(msg, tags, request){
 module.exports.macro = macro;
 module.exports.quickMacro = quickMacro;
 module.exports.echo = echo;
+module.exports.gif = gif;
