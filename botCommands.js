@@ -1,4 +1,5 @@
 var macro = function (msg, tags, MongoClient, dbUrl) {
+    tags[1].toLowerCase;
     let guildID = msg.channel.guild.id;
     console.log(tags);
     if (tags[0] == "add" && tags.length == 3) {
@@ -157,6 +158,7 @@ var macro = function (msg, tags, MongoClient, dbUrl) {
 };
 
 var quickMacro = function (msg, tag, MongoClient, dbUrl) {
+    tag[0].toLowerCase;
     let guildID = msg.channel.guild.id;
     console.log(tag);
 
