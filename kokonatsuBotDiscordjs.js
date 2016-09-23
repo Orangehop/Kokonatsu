@@ -20,7 +20,7 @@ var botCommands = require('./botCommands');
 var bot = new Discord.Client();
 
 bot.on("message", msg => {
-    let prefix = "kdev!";
+    let prefix = "k!";
     var command;
     if(!msg.content.startsWith(prefix) || msg.author.bot || msg.content.length <= prefix.length) return;
     else command = msg.content.split("!")[1].split(" ")[0];
