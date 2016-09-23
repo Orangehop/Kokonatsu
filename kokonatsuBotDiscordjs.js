@@ -28,7 +28,9 @@ bot.on("message", msg => {
     console.log(command);
 
 
-    var tags = msg.content.split(" ").shift();
+    var tags = msg.content.split(" ");
+    tags.shift();
+    console.log(tags);
 
     if (command == "echo") {
         botCommands.echo(msg);
