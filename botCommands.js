@@ -86,12 +86,8 @@ var macro = function (msg, tags, macros) {
                     });
             } else {
                 macros.findOneAndDelete({
-                        guild: {
-                            $eq: guildID
-                        },
-                        macro: {
-                            $eq: tags[1]
-                        }
+                        guild: guildID,
+                        macro: tags[1]
                     },
                     function (err, res) {
                         let macro = res.value;
@@ -105,28 +101,34 @@ var macro = function (msg, tags, macros) {
     }
 };
 
-var quickMacro = function (msg, tags, macros) {
-    tags[0] = tags[0].toLowerCase();
+var quickMacro = function (msg, macroName, tags, macros) {
+    macroName = macroName.toLowerCase();
+    var macroNumber;
+    if(tags[0]){
+        macroNumber = parseInt(tags[0]);
+    }
     let guildID = msg.channel.guild.id;
     console.log(tags);
 
     macros.findOne({
         guild: guildID,
-        macro: tags[0]
+        macro: macroName
     }, function (err, macro) {
         if (macro == null) {
-            msg.channel.sendMessage(tags[0] + ' does not exist');
+            msg.channel.sendMessage(macroName + ' does not exist');
         } else {
-            if (tags[1] && (parseInt(tags[1]) != NaN)) {
+            if (macroNumber && (macroNumber != NaN)) {
                 console.log(macro);
-                if (parseInt(tags[1]) <= macro.links.length) {
-                    msg.channel.sendMessage(macro.links[parseInt(tags[1]) - 1]);
+                if (macroNumber <= macro.links.length) {
+                    msg.channel.sendMessage(macro.links[macroNumber - 1]);
+                    macros.findOneAndUpdate({_id: macro._id}, {$set:{usage: parseInt(macro.usage)+1}});
                 } else {
                     msg.channel.sendMessage(tags[0] + " " + tags[1] + ' does not exist');
                 }
             } else {
                 console.log(macro)
                 msg.channel.sendMessage(macro.links[ ((Math.random() * 1e3) | 0) % macro.links.length ]);
+                macros.findOneAndUpdate({_id: macro._id}, {$set:{usage: parseInt(macro.usage)+1}});
             }
         }
     });
@@ -146,7 +148,27 @@ var gif = function (msg, tags, request) {
     });
 };
 
+var help = function (msg, tags){
+    console.log(tags);
+    if (tags.length != 1) return;
+    var HelpCommands = {macro: 0};
+    var helpNo = HelpCommands[tags[0]];
+    HelpMessage = [
+"Kokonatsu Help Menu \n\n\
+Macro: __Outputs a link when a recorded macro is typed__ \n\n\
+Config Usage: k!macro add <macroName> <link> | delete <macroName> <macroNumber> | list \n\
+Output Usage: k!<macroName> <optional macroNumber> \n\n\
+Examples: \n\
+`k!macro add clap http://i.imgur.com/ezHbFKc.gif` adds the link to the macro clap \n\
+`k!clap #` outputs the macro's link. If no # is specified then a random link from the macro will be played \n\
+`k!macro delete clap #` deletes link number # from the macro. If the macro has only one link than the entire macro is deleted"
+];
+    console.log(HelpMessage[helpNo]);
+    msg.channel.sendMessage(HelpMessage[helpNo]);
+}
+
 module.exports.macro = macro;
 module.exports.quickMacro = quickMacro;
 module.exports.echo = echo;
 module.exports.gif = gif;
+module.exports.help = help;

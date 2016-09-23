@@ -20,7 +20,7 @@ var botCommands = require('./botCommands');
 var bot = new Discord.Client();
 
 bot.on("message", msg => {
-    let prefix = "k!";
+    let prefix = "kdev!";
     var command;
     if(!msg.content.startsWith(prefix) || msg.author.bot || msg.content.length <= prefix.length) return;
     else command = msg.content.split("!")[1].split(" ")[0];
@@ -28,8 +28,7 @@ bot.on("message", msg => {
     console.log(command);
 
 
-    var tags = msg.content.substr(msg.content.indexOf(" ")+1).split(" ");
-    var quickMacroTags = msg.content.substr(msg.content.indexOf(prefix)+prefix.length).split(" ");
+    var tags = msg.content.split(" ").shift();
 
     if (command == "echo") {
         botCommands.echo(msg);
@@ -42,9 +41,12 @@ bot.on("message", msg => {
             botCommands.macro(msg, tags, macros);
         });
     }
+    else if(command == "help"){
+        botCommands.help(msg, tags);
+    }
     else{
         macrosConnected.then(function(macros){
-            botCommands.quickMacro(msg, quickMacroTags, macros);
+            botCommands.quickMacro(msg, command, tags, macros);
         });
     }
 });
