@@ -40,7 +40,7 @@ var macro = function(msg, tags, MongoClient, dbUrl){
                     macros.find({guild: {$eq: guildID}}).toArray(function(err, macroList){
                         console.log(macroList);
 
-                        msg.channel.sendMessage("Feature not Implemented, check console log");
+                        msg.channel.sendMessage("view all the macros here: http://kokonatsu-macros.herokuapp.com/#/home");
 
                         db.close();
                     });
