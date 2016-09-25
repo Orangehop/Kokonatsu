@@ -48,7 +48,8 @@ var macro = function (msg, tags, macros) {
                     "```Macro Name\t\t\tTimes Used\n" + resultString + "```");
             });
         } else {
-            macros.find({guild: guildId}).sort({ usage : -1}).limit(10).toArray(function (err, top) {
+            console.log(guildID);
+            macros.find({guild: guildID}).sort({ usage : -1}).limit(10).toArray(function (err, top) {
                 console.log(top);
                 let resultString = "";
                 for (let entry of top) {
