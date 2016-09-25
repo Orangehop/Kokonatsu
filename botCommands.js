@@ -162,7 +162,7 @@ var quickMacro = function (msg, macroName, tags, macros) {
             } else {
                 console.log(macro)
                 var randNumber = Math.floor(Math.random() * macro.links.length);
-                msg.channel.sendMessage(macro.macro+" "+randNumber+"/"+macro.links.length+" "+macro.links[randNumber]);
+                msg.channel.sendMessage((randNumber + 1)+"/"+macro.links.length+" "+macro.links[randNumber]);
                 macros.findOneAndUpdate({_id: macro._id}, {$set:{usage: parseInt(macro.usage)+1}});
             }
         }
