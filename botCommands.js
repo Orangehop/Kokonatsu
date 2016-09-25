@@ -9,7 +9,8 @@ var macro = function (msg, tags, macros) {
         }, {
             $set: {
                 guild: guildID,
-                macro: tags[1]
+                macro: tags[1],
+                usage: 0
             },
             $push: {
                 links: {$each: [tags[2]]}
@@ -33,6 +34,38 @@ var macro = function (msg, tags, macros) {
             console.log(macroList);
 
             msg.channel.sendMessage("view all the macros here: http://kokonatsu-macros.herokuapp.com/#/home");
+        });
+    }
+    else if (tags[0] == "top") {
+        console.log("displaying top macros\n");
+        if (tags[1] && parseInt(tags[1]) != NaN) {
+             macros.find({guild: guildId}).sort({ usage : -1}).limit(parseInt(tags[1])).toArray(function (err, top) {
+                let resultString = "";
+                for (let entry of top) {
+                    resultString += entry.macro + ("                      " + entry.usage).slice(entry.macro.length) + "\n";
+                }
+                msg.channel.sendMessage("The Top " + parseInt(tags[1]) + " Used Macros!\n" + 
+                    "```Macro Name\t\t\tTimes Used\n" + resultString + "```");
+            });
+        } else {
+            macros.find({guild: guildId}).sort({ usage : -1}).limit(10).toArray(function (err, top) {
+                console.log(top);
+                let resultString = "";
+                for (let entry of top) {
+                    resultString += entry.macro + ("                      " + entry.usage).slice(entry.macro.length) + "\n";
+                }
+                msg.channel.sendMessage("The Top 10 Used Macros!\n" + 
+                    "```Macro Name\t\t\tTimes Used\n" + resultString + "```");
+            });
+        }
+    }
+    else if (tags[0] == "usage" && tags[1] != null) {
+        macros.findOne({guild: guildId, macro: tags[1]}, function (err, macro) {
+            if (macro) {
+                msg.channel.sendMessage(":heart: The macro \'" + tags[1] + "\' has been used " + macro.usage + " times! :heart:");
+            } else {
+                msg.channel.sendMessage("Enter a proper macro name, you fucking dumb piece of shit. Oops, I mean you baka!");
+            }
         });
     }
     else if ((tags[0] == "delete" || tags[0] == "remove") && (tags.length == 2 || tags.length == 3)) {
@@ -127,7 +160,7 @@ var quickMacro = function (msg, macroName, tags, macros) {
                 }
             } else {
                 console.log(macro)
-                msg.channel.sendMessage(macro.links[Math.floor(Math.random() * macro.links.length)];
+                msg.channel.sendMessage(macro.links[Math.floor(Math.random() * macro.links.length)]);
                 macros.findOneAndUpdate({_id: macro._id}, {$set:{usage: parseInt(macro.usage)+1}});
             }
         }
