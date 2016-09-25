@@ -10,7 +10,9 @@ var macro = function (msg, tags, macros) {
             $set: {
                 guild: guildID,
                 macro: tags[1],
-                usage: 0
+            },
+            $setOnInsert: {
+                usage: 0  
             },
             $push: {
                 links: {$each: [tags[2]]}
