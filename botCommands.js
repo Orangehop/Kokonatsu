@@ -147,6 +147,7 @@ var quickMacro = function (msg, macroName, tags, macros) {
         guild: guildID,
         macro: macroName
     }, function (err, macro) {
+        console.log(macro);
         if (macro == null) {
             msg.channel.sendMessage(macroName + ' does not exist');
         } else {
@@ -160,7 +161,8 @@ var quickMacro = function (msg, macroName, tags, macros) {
                 }
             } else {
                 console.log(macro)
-                msg.channel.sendMessage(macro.links[Math.floor(Math.random() * macro.links.length)]);
+                var randNumber = Math.floor(Math.random() * macro.links.length);
+                msg.channel.sendMessage(macro.macro+" "+randNumber+"/"+macro.links.length+" "+macro.links[randNumber]);
                 macros.findOneAndUpdate({_id: macro._id}, {$set:{usage: parseInt(macro.usage)+1}});
             }
         }
