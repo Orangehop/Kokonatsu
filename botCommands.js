@@ -39,7 +39,7 @@ var macro = function (msg, tags, macros) {
     else if (tags[0] == "top") {
         console.log("displaying top macros\n");
         if (tags[1] && parseInt(tags[1]) != NaN) {
-             macros.find({guild: guildId}).sort({ usage : -1}).limit(parseInt(tags[1])).toArray(function (err, top) {
+             macros.find({guild: guildID}).sort({ usage : -1}).limit(parseInt(tags[1])).toArray(function (err, top) {
                 let resultString = "";
                 for (let entry of top) {
                     resultString += entry.macro + ("                      " + entry.usage).slice(entry.macro.length) + "\n";
@@ -60,7 +60,7 @@ var macro = function (msg, tags, macros) {
         }
     }
     else if (tags[0] == "usage" && tags[1] != null) {
-        macros.findOne({guild: guildId, macro: tags[1]}, function (err, macro) {
+        macros.findOne({guild: guildID, macro: tags[1]}, function (err, macro) {
             if (macro) {
                 msg.channel.sendMessage(":heart: The macro \'" + tags[1] + "\' has been used " + macro.usage + " times! :heart:");
             } else {
