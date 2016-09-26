@@ -68,7 +68,7 @@ app.post('/github', function (req, res) {
         var author = commit.author.name;
         var msg = commit.message;
         var url = commit.url;
-        var reply = author+" has pushed a commit to "+repo+"\n`"+msg+"`\nview it here: "+url;
+        var reply = "<@225637499953741836>"+author+" has pushed a commit to "+repo+"\n`"+msg+"`\nview it here: "+url;
         request.post({"url": "https://discordapp.com/api/channels/"+process.env.DEVCHANNELID+"/messages", "headers": AuthHeaders, json: {content: reply}});
     });
 
