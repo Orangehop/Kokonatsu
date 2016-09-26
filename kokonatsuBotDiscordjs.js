@@ -29,8 +29,7 @@ var bot = new Discord.Client();
 bot.on("message", msg => {
     let prefix = process.env.PREFIX;
     var command;
-    msg.content = msg.content.toLowerCase();
-    if(!msg.content.startsWith(prefix) || msg.author.bot || msg.content.length <= prefix.length) return;
+    if(!(msg.content.startsWith(prefix.toLowerCase()) || msg.content.startsWith(prefix.toUpperCase())) || msg.author.bot || msg.content.length <= prefix.length) return;
     else command = msg.content.split("!")[1].split(" ")[0];
     console.log(msg.content);
     console.log(command);
