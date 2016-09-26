@@ -12,10 +12,10 @@ var macro = function (msg, tags, macros) {
                 macro: tags[1],
             },
             $setOnInsert: {
-                usage: 0  
+                usage: 0
             },
-            $push: {
-                links: {$each: [tags[2]]}
+            $addToSet: {
+                links: tags[2]
             }
         }, {
             upsert: true,
@@ -62,7 +62,7 @@ var macro = function (msg, tags, macros) {
                });
            }
         });
-    }    
+    }
     else if (tags[0] == "top") {
         console.log("displaying top macros\n");
         if (tags[1] && parseInt(tags[1]) != NaN) {
@@ -71,7 +71,7 @@ var macro = function (msg, tags, macros) {
                 for (let entry of top) {
                     resultString += entry.macro + ("                      " + entry.usage).slice(entry.macro.length) + "\n";
                 }
-                msg.channel.sendMessage("The Top " + parseInt(tags[1]) + " Used Macros!\n" + 
+                msg.channel.sendMessage("The Top " + parseInt(tags[1]) + " Used Macros!\n" +
                     "```Macro Name\t\t\tTimes Used\n" + resultString + "```");
             });
         } else {
@@ -82,7 +82,7 @@ var macro = function (msg, tags, macros) {
                 for (let entry of top) {
                     resultString += entry.macro + ("                      " + entry.usage).slice(entry.macro.length) + "\n";
                 }
-                msg.channel.sendMessage("The Top 10 Used Macros!\n" + 
+                msg.channel.sendMessage("The Top 10 Used Macros!\n" +
                     "```Macro Name\t\t\tTimes Used\n" + resultString + "```");
             });
         }
