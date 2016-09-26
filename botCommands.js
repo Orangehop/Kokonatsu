@@ -38,6 +38,31 @@ var macro = function (msg, tags, macros) {
             msg.channel.sendMessage("view all the macros here: http://kokonatsu-macros.herokuapp.com/#/home");
         });
     }
+    else if (tags[0] == "rename" && tags[1] != null && tags[2] != null) {
+        macros.findOne({
+            guild: guildID,
+            macro: tags[2]
+        }, function (err, macro) {
+           if (macro) {
+               msg.channel.sendMessage("x" + tags[2] + " already exists!");
+           } else {
+               macros.findOneAndUpdate({
+                   guild: guildID,
+                   macro: tags[1]
+               }, {
+                   $set : { macro : tags [2] }
+               }, function (err, result){
+                   if (err) {
+                       msg.channel.sendMessage("Kyaaah! Strange error!");
+                   } else if (result.macro){
+                       msg.channel.sendMessage(":ok_hand: Macro " + tags[1] + " has been renamed to " + tags[2]);
+                   } else {
+                       msg.channel.sendMessage(tags[1] + " does not exist!");
+                   }
+               });
+           }
+        });
+    }    
     else if (tags[0] == "top") {
         console.log("displaying top macros\n");
         if (tags[1] && parseInt(tags[1]) != NaN) {
