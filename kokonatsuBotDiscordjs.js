@@ -14,7 +14,7 @@ var request = require('request');
 
 var mongodb = require('mongodb');
 var MongoClient = mongodb.MongoClient;
-var dbUrl = 'mongodb://admin:password@ds047612.mlab.com:47612/kokonatsu';
+var dbUrl = process.env.KOKONATSUDB;
 var macrosConnected = MongoClient.connect(dbUrl).then(function(db){
     return db.collection('Macros');
 });
@@ -23,7 +23,7 @@ var botCommands = require('./botCommands');
 var bot = new Discord.Client();
 
 bot.on("message", msg => {
-    let prefix = "k!";
+    let prefix = process.env.PREFIX;
     var command;
     if(!msg.content.startsWith(prefix) || msg.author.bot || msg.content.length <= prefix.length) return;
     else command = msg.content.split("!")[1].split(" ")[0];
@@ -61,4 +61,4 @@ bot.on('ready', () => {
   console.log('I am ready!');
 });
 
-bot.login("MjI1NjQwMTg0MDgxODA5NDA4.CrxrOw.aKPI8pIeKgwiQJOM02A_cQiCEKQ");
+bot.login(process.env.BOTTOKEN);
