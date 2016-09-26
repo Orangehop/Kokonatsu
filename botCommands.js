@@ -44,7 +44,7 @@ var macro = function (msg, tags, macros) {
             macro: tags[2]
         }, function (err, macro) {
            if (macro) {
-               msg.channel.sendMessage("x" + tags[2] + " already exists!");
+               msg.channel.sendMessage(":x: \'" + tags[2] + "\' already exists!");
            } else {
                macros.findOneAndUpdate({
                    guild: guildID,
@@ -54,10 +54,10 @@ var macro = function (msg, tags, macros) {
                }, function (err, result){
                    if (err) {
                        msg.channel.sendMessage("Kyaaah! Strange error!");
-                   } else if (result.macro){
-                       msg.channel.sendMessage(":ok_hand: Macro " + tags[1] + " has been renamed to " + tags[2]);
+                   } else if (result){
+                       msg.channel.sendMessage(":ok_hand: Macro \'" + tags[1] + "\' has been renamed to \'" + tags[2]+"\'!");
                    } else {
-                       msg.channel.sendMessage(tags[1] + " does not exist!");
+                       msg.channel.sendMessage("\'" + tags[1] + "\' does not exist!");
                    }
                });
            }
