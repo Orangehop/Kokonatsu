@@ -62,6 +62,10 @@ bot.on("message", msg => {
 });
 
 app.post('/github', function (req, res) {
+    res.send('Received github payload');
+    if(req.get("X-GitHub-Event") != "push"){
+        return;
+    }
     var payload = req.body;
     var repo = payload.repository.name;
     payload.commits.forEach(function(commit){
@@ -71,8 +75,6 @@ app.post('/github', function (req, res) {
         var reply = "<@225637499953741836>"+author+" has pushed a commit to "+repo+"\n`"+msg+"`\nview it here: "+url;
         request.post({"url": "https://discordapp.com/api/channels/"+process.env.DEVCHANNELID+"/messages", "headers": AuthHeaders, json: {content: reply}});
     });
-
-    res.send('Received github payload');
 });
 
 bot.on('ready', () => {
