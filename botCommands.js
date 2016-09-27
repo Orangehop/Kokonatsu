@@ -14,8 +14,8 @@ var macro = function (msg, tags, macros) {
             $setOnInsert: {
                 usage: 0
             },
-            $addToSet: {
-                links: tags[2]
+            $push: {
+                links: {$each: [tags[2]]}
             }
         }, {
             upsert: true,
