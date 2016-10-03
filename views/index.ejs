@@ -1,0 +1,85 @@
+<html>
+  <head>
+    <title>Kokonatsu Macros</title>
+    <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.10/angular.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.10/angular-ui-router.js"></script>
+    <script src="/javascripts/angularApp.js"></script>
+    <script src="/javascripts/dirPagination.js"></script>
+    <style>
+      .gfy-video
+        {
+            max-height: 252px !important;
+        }
+    </style>
+      
+
+    </head>
+  <body ng-app="kokonatsu" ng-controller="MainCtrl" controller>
+    <div class="row" align = "center">
+      <h1>Kokonatsu Macros</h1>
+    </div>
+
+    <!-- Guild Tabs -->
+    <div class="container-fluid">
+      <div class="row">
+        <nav style="margin: 0 20px">
+          <ul class="nav nav-tabs">
+            <li ng-repeat="guild in guilds" ng-click="setGuild(guild.id, $index)" ng-init="setGuild(guilds[0].id, 0)" ng-class="{active: $index === currentTab}"><a href="#">{{guild.name}}</a></li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="container">
+      <form style="margin-top:15px">
+        <div class="form-group row">
+          <div class="col-md-11"><input type="text" ng-model="search" ng-init="search=''" class="form-control" placeholder="Search"  ng-change="reloadGfycat()"></div>
+          <div class="dropdown col-md-1">
+            <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown">
+              Sort By
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+              <li ng-click="setSortKey(key)" ng-repeat="key in sortKeys"><a href="#">{{key}}</a></li>
+            </ul>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Alphabet Filter -->
+    <div class="container-fluid" align="center"><nav>
+      <div class="button-group btn-group-sm" ng-repeat="letter in alphabet" style="display:inline-block; margin: 0px 5px">
+        <button type="button" class="btn btn-primary" ng-click="filterAlphabet(letter)">{{letter}}</button>
+      </div>
+    </nav></div>
+
+    <!-- Macro Grid -->
+    <div class="container-fluid" align="center" ng-init="setSortKey('Macro Names')">
+      <span dir-paginate="macro in displayMacros | orderBy: [sortKey,'index'] | filter: {macro: search, guild: guildFilter} | itemsPerPage: 12" current-page="currentPage" style="">
+         <div style="display:inline-block; margin: 0px 5px;">
+          <div style="float:top"><h3>{{macro.macro}}<span ng-if="macro.index>=0"> ({{macro.index+1}})</span></h3></div>
+          <div style="float:left">
+            <a href="{{macro.links[0]}}">
+            <img src="{{macro.links[0]}}" class="img-thumbnail" ng-if="img(macro,macro.links[0])" style="width:450px; height:252px;">
+            <video ng-if="video(macro.links[0])" preload="auto" autoplay="autoplay" loop="loop" style="width:450px; max-height:252px;">
+              <source src="{{trustAsResourceUrl(macro.links[0])}}" type="video/mp4">
+            </video>
+		    <span class='gfyitem' data-id="{{gfycatDataID(macro.links[0])}}" ng-if="gfycat(macro.links[0])" style="width:450px; max-height:252px;"></span>
+            </a>
+          </div>
+        </div>
+      </span>
+    </div>
+
+    <!-- Pagination Bar -->
+    <div style="text-align:center">
+      <dir-pagination-controls on-page-change="pageChanged()" max-size="30" align="center"></dir-pagination-controls>
+    </div>
+
+  </body>
+</html>

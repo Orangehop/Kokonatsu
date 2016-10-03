@@ -35,7 +35,7 @@ var macro = function (msg, tags, macros) {
         }).toArray(function (err, macroList) {
             console.log(macroList);
 
-            msg.channel.sendMessage("view all the macros here: http://kokonatsu-macros.herokuapp.com/#/home");
+            msg.channel.sendMessage("view all the macros here: http://kokonatsu.herokuapp.com");
         });
     }
     else if (tags[0] == "rename" && tags[1] != null && tags[2] != null) {

@@ -1,34 +1,3 @@
-// need to listen or heroku will close the app in 60s
-var express = require('express');
-var bodyParser = require('body-parser');
-var app = express();
-app.use(bodyParser.json()); // for parsing application/json
-app.set('port', (process.env.PORT || 5000));
-app.get('/', function (req, res) {
-  res.send('Hello World!');
-});
-app.listen(app.get('port'), function() {
-    console.log('Node app is running on port', app.get('port'));
-});
-
-app.post('/github', function (req, res) {
-    res.send('Received github payload');
-    if(req.get("X-GitHub-Event") != "push"){
-        return;
-    }
-    var payload = req.body;
-    var repo = payload.repository.name;
-    payload.commits.forEach(function(commit){
-        var author = commit.author.name;
-        var msg = commit.message;
-        var url = commit.url;
-        var reply = "@everyone "+author+" has pushed a commit to "+repo+"\n`"+msg+"`\nview it here: "+url;
-        request.post({"url": "https://discordapp.com/api/channels/"+process.env.DEVCHANNELID+"/messages", "headers": AuthHeaders, json: {content: reply}});
-    });
-});
-
-var AuthHeaders = {"User-Agent" : "Kokonatsu (http://test.com, v0.1)", "Authorization" : "Bot "+process.env.BOTTOKEN};
-
 var Discord = require("discord.js");
 var request = require('request');
 
