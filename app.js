@@ -10,6 +10,11 @@ var users = require('./routes/users');
 
 var favicon = require('serve-favicon');
 
+var mongoose = require('mongoose');
+mongoose.Promise = global.Promise;
+require('./models/Macros');
+
+mongoose.connect(process.env.KOKONATSUDB);
 
 var app = express();
 

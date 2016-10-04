@@ -1,12 +1,4 @@
 var Discord = require("discord.js");
-var request = require('request');
-
-var mongodb = require('mongodb');
-var MongoClient = mongodb.MongoClient;
-var dbUrl = process.env.KOKONATSUDB;
-var macrosConnected = MongoClient.connect(dbUrl).then(function(db){
-    return db.collection('oldMacros');
-});
 
 var botCommands = require('./botCommands');
 var bot = new Discord.Client();
@@ -28,20 +20,16 @@ bot.on("message", msg => {
         botCommands.echo(msg);
     }
     else if(command == "gif") {
-        botCommands.gif(msg, tags, request);
+        botCommands.gif(msg, tags);
     }
     else if(command == "macro") {
-        macrosConnected.then(function(macros){
-            botCommands.macro(msg, tags, macros);
-        });
+        botCommands.macro(msg, tags);
     }
     else if(command == "help"){
         botCommands.help(msg, tags);
     }
     else{
-        macrosConnected.then(function(macros){
-            botCommands.quickMacro(msg, command, tags, macros);
-        });
+        botCommands.quickMacro(msg, command, tags);
     }
 });
 
