@@ -5,7 +5,7 @@ var mongodb = require('mongodb');
 var MongoClient = mongodb.MongoClient;
 var dbUrl = process.env.KOKONATSUDB;
 var macrosConnected = MongoClient.connect(dbUrl).then(function(db){
-    return db.collection('Macros');
+    return db.collection('oldMacros');
 });
 
 var botCommands = require('./botCommands');
