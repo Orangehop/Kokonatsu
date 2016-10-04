@@ -36,6 +36,23 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', routes);
 app.use('/users', users);
 
+app.post('/github', function (req, res) {
+    res.send('Received github payload');
+    if(req.get("X-GitHub-Event") != "push"){
+        return;
+    }
+    var payload = req.body;
+    var repo = payload.repository.name;
+    payload.commits.forEach(function(commit){
+        var AuthHeaders = {"User-Agent" : "Kokonatsu (http://test.com, v0.1)", "Authorization" : "Bot "+process.env.BOTTOKEN};
+        var author = commit.author.name;
+        var msg = commit.message;
+        var url = commit.url;
+        var reply = "@everyone "+author+" has pushed a commit to "+repo+"\n`"+msg+"`\nview it here: "+url;
+        require('request').post({"url": "https://discordapp.com/api/channels/"+process.env.DEVCHANNELID+"/messages", "headers": AuthHeaders, json: {content: reply}});
+    });
+});
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
