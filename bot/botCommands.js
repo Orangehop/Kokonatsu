@@ -7,14 +7,14 @@ var macro = function (msg, tags) {
     let guildID = msg.channel.guild.id;
     var command = tags[0];
     var name = tags[1].toLowerCase();
-    console.log(tags);
-    if (command == "add" && tags.length == 3) {
+    var tagNumbers = tags.length
+    if (command == "add" && tagNumbers == 3) {
         var link = tags[2];
 
-        Macro.find({name: name, guild: guildID}).exec().
+        Macro.find({name: name, guild: guildID}).
         then(function(macros){
             var number;
-            if(typeof macros !== 'undefined' && macros) number = macros.length;
+            if(macros.length > 0) number = macros.length;
             else number = 0;
             Macro.create({
                 name: name,
@@ -27,44 +27,44 @@ var macro = function (msg, tags) {
                 favorites: 0
             }).
             then(function(newMacro){
-                msg.channel.sendMessage("Inserted Macro\n\n"+name+" "+number+"\n"+link);
+                msg.channel.sendMessage(name+" "+(number+1)+"\n"+link);
             });
         });
     }
+    // add back list command when website is done
     // else if (tags[0] == "list") {
-    //     macros.find({
-    //         guild: guildID
-    //     }).toArray(function (err, macroList) {
-    //         console.log(macroList);
+    //     msg.channel.sendMessage("view all the macros here: http://kokonatsu.herokuapp.com");
+    // }
+    else if (tags[0] == "rename" && tags[1] != null && tags[2] != null) {
+        var newName = tags[2];
+        Macro.find({
+            guild: guildID,
+            name: newName,
+        }).
+        then(function(macros){
+            return new Promise(function(resolve, reject){
+                if(macros.length > 0) resolve(true);
+                else resolve(false);
+            });
+        }).
+        then(function(exists){
+            if(exists) msg.channel.sendMessage(":x: \'" + newName+ "\' already exists!");
+            else{
+                Macro.find({
+                    guild: guildID,
+                    name: name,
+                }).
+                then(function(macros){
+                    macros.forEach(function(macro){
+                        macro.name = newName;
+                        macro.save();
+                    });
 
-    //         msg.channel.sendMessage("view all the macros here: http://kokonatsu.herokuapp.com");
-    //     });
-    // }
-    // else if (tags[0] == "rename" && tags[1] != null && tags[2] != null) {
-    //     macros.findOne({
-    //         guild: guildID,
-    //         macro: tags[2]
-    //     }, function (err, macro) {
-    //        if (macro) {
-    //            msg.channel.sendMessage(":x: \'" + tags[2] + "\' already exists!");
-    //        } else {
-    //            macros.findOneAndUpdate({
-    //                guild: guildID,
-    //                macro: tags[1]
-    //            }, {
-    //                $set : { macro : tags [2] }
-    //            }, function (err, result){
-    //                if (err) {
-    //                    msg.channel.sendMessage("Kyaaah! Strange error!");
-    //                } else if (result){
-    //                    msg.channel.sendMessage(":ok_hand: Macro \'" + tags[1] + "\' has been renamed to \'" + tags[2]+"\'!");
-    //                } else {
-    //                    msg.channel.sendMessage("\'" + tags[1] + "\' does not exist!");
-    //                }
-    //            });
-    //        }
-    //     });
-    // }
+                    msg.channel.sendMessage(":ok_hand: Macro \'" + tags[1] + "\' has been renamed to \'" + tags[2]+"\'!");
+                });
+            }
+        });
+    }
     // else if (tags[0] == "top") {
     //     console.log("displaying top macros\n");
     //     if (tags[1] && parseInt(tags[1]) != NaN) {

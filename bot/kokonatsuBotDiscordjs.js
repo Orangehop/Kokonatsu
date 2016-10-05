@@ -9,12 +9,9 @@ bot.on("message", msg => {
     if(!(msg.content.startsWith(prefix.toLowerCase()) || msg.content.startsWith(prefix.toUpperCase())) || msg.author.bot || msg.content.length <= prefix.length) return;
     else command = msg.content.split("!")[1].split(" ")[0];
     console.log(msg.content);
-    console.log(command);
-
 
     var tags = msg.content.split(" ");
     tags.shift();
-    console.log(tags);
 
     if (command == "echo") {
         botCommands.echo(msg);
