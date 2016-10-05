@@ -14,7 +14,7 @@
             max-height: 252px !important;
         }
     </style>
-      
+
 
     </head>
   <body ng-app="kokonatsu" ng-controller="MainCtrl" controller>
@@ -60,16 +60,16 @@
 
     <!-- Macro Grid -->
     <div class="container-fluid" align="center" ng-init="setSortKey('Macro Names')">
-      <span dir-paginate="macro in displayMacros | orderBy: [sortKey,'index'] | filter: {macro: search, guild: guildFilter} | itemsPerPage: 12" current-page="currentPage" style="">
+      <span dir-paginate="macro in displayMacros | orderBy: [sortKey,'number'] | filter: {name: search, guild: guildFilter} | itemsPerPage: 12" current-page="currentPage" style="">
          <div style="display:inline-block; margin: 0px 5px;">
-          <div style="float:top"><h3>{{macro.macro}}<span ng-if="macro.index>=0"> ({{macro.index+1}})</span></h3></div>
+          <div style="float:top"><h3>{{macro.name}} ({{macro.number}})</h3></div>
           <div style="float:left">
-            <a href="{{macro.links[0]}}">
-            <img src="{{macro.links[0]}}" class="img-thumbnail" ng-if="img(macro,macro.links[0])" style="width:450px; height:252px;">
-            <video ng-if="video(macro.links[0])" preload="auto" autoplay="autoplay" loop="loop" style="width:450px; max-height:252px;">
-              <source src="{{trustAsResourceUrl(macro.links[0])}}" type="video/mp4">
+            <a href="{{macro.link}}">
+            <img src="{{macro.link}}" class="img-thumbnail" ng-if="img(macro,macro.link)" style="width:450px; height:252px;">
+            <video ng-if="video(macro.link)" preload="auto" autoplay="autoplay" loop="loop" style="width:450px; max-height:252px;">
+              <source src="{{trustAsResourceUrl(macro.link)}}" type="video/mp4">
             </video>
-		    <span class='gfyitem' data-id="{{gfycatDataID(macro.links[0])}}" ng-if="gfycat(macro.links[0])" style="width:450px; max-height:252px;"></span>
+		    <span class='gfyitem' data-id="{{gfycatDataID(macro.link)}}" ng-if="gfycat(macro.link)" style="width:450px; max-height:252px;"></span>
             </a>
           </div>
         </div>

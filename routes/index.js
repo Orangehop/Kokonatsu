@@ -2,9 +2,8 @@ var express = require('express');
 var request = require('request');
 var router = express.Router();
 var session = require('express-session');
-var mongodb = require('mongodb');
-var MongoClient = mongodb.MongoClient;
-var dbUrl = process.env.KOKONATSUDB
+var mongoose = require('mongoose');
+var Macro = mongoose.model('macro');
 var hostname = process.env.HOSTNAME;
 var clientId = process.env.CLIENTID;
 var clientSecret = process.env.CLIENTSECRET;
@@ -77,7 +76,7 @@ router.get('/index', function(req, res, nest) {
     }
 });
 
-router.get('/macros', function(req, res, next) {
+router.get('/getmacros', function(req, res, next) {
     botGuildPromise.then(function(botGuilds){
         if(!req.session.access_token){
             res.redirect('/login');
@@ -102,15 +101,9 @@ router.get('/macros', function(req, res, next) {
                         }
                     });
                 });
-                MongoClient.connect(dbUrl)
-                .then(function(db){
-                    return db.collection('Macros');
-                })
-                .then(function(macros){
-                    console.log(sharedGuilds);
-                    macros.find({guild: {$in: guildIds}}).toArray(function(err, macroArray){
-                        res.json({guilds: sharedGuilds, macros: macroArray});
-                    });
+                Macro.find({guild: {$in: guildIds}}).
+                then(function(macros){
+                    res.json({guilds: sharedGuilds, macros: macros});
                 });
             });
         }
