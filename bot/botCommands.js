@@ -6,9 +6,9 @@ var Macro = mongoose.model('TestMacro');
 var macro = function (msg, tags) {
     let guildID = msg.channel.guild.id;
     var command = tags[0];
-    var name = tags[1].toLowerCase();
-    var tagNumbers = tags.length
-    if (command == "add" && tagNumbers == 3) {
+    var tagLength = tags.length
+    if (command == "add" && tagLength == 3) {
+        var name = tags[1].toLowerCase();
         var link = tags[2];
 
         Macro.find({name: name, guild: guildID}).
@@ -21,8 +21,8 @@ var macro = function (msg, tags) {
                 guild: guildID,
                 number: number,
                 link: link,
-                upvotes: [],
-                downvotes: [],
+                voters: [],
+                score: 0,
                 usage: 0,
                 favorites: 0
             }).
@@ -35,7 +35,8 @@ var macro = function (msg, tags) {
     // else if (tags[0] == "list") {
     //     msg.channel.sendMessage("view all the macros here: http://kokonatsu.herokuapp.com");
     // }
-    else if (tags[0] == "rename" && tags[1] != null && tags[2] != null) {
+    else if (tags[0] == "rename" && tagLength == 3) {
+        var name = tags[1].toLowerCase();
         var newName = tags[2];
         Macro.find({
             guild: guildID,
@@ -65,30 +66,21 @@ var macro = function (msg, tags) {
             }
         });
     }
-    // else if (tags[0] == "top") {
-    //     console.log("displaying top macros\n");
-    //     if (tags[1] && parseInt(tags[1]) != NaN) {
-    //          macros.find({guild: guildID}).sort({ usage : -1}).limit(parseInt(tags[1])).toArray(function (err, top) {
-    //             let resultString = "";
-    //             for (let entry of top) {
-    //                 resultString += entry.macro + ("                      " + entry.usage).slice(entry.macro.length) + "\n";
-    //             }
-    //             msg.channel.sendMessage("The Top " + parseInt(tags[1]) + " Used Macros!\n" +
-    //                 "```Macro Name\t\t\tTimes Used\n" + resultString + "```");
-    //         });
-    //     } else {
-    //         console.log(guildID);
-    //         macros.find({guild: guildID}).sort({ usage : -1}).limit(10).toArray(function (err, top) {
-    //             console.log(top);
-    //             let resultString = "";
-    //             for (let entry of top) {
-    //                 resultString += entry.macro + ("                      " + entry.usage).slice(entry.macro.length) + "\n";
-    //             }
-    //             msg.channel.sendMessage("The Top 10 Used Macros!\n" +
-    //                 "```Macro Name\t\t\tTimes Used\n" + resultString + "```");
-    //         });
-    //     }
-    // }
+    else if (command == "top") {
+        var limitNumber;
+        if(tags[1] && parseInt(tags[1]) !== NaN) limitNumber = parseInt(tags[1]);
+        else limitNumber = 10;
+
+        Macro.find({guild: guildID}).sort({score: -1}).limit(limitNumber).exec().
+        then(function(macros){
+            let resultString = "";
+            macros.forEach(function(macro){
+                resultString += macro.name + ("                          " + macro.score).slice(macro.name.length) + "\n";
+            });
+            msg.channel.sendMessage("The Top " + limitNumber + " Used Macros!\n" +
+                    "```Name:\t\t\t\t\tScore:\n" + resultString + "```");
+        });
+    }
     // else if (tags[0] == "usage" && tags[1] != null) {
     //     macros.findOne({guild: guildID, macro: tags[1]}, function (err, macro) {
     //         if (macro) {

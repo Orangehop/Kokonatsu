@@ -5,8 +5,8 @@ var MacroSchema = new mongoose.Schema({
     guild: String,
     number: Number,
     link: String,
-    upvotes: [String],
-    downvotes: [String],
+    voters: [String],
+    score: Number,
     usage: Number,
     favorites: Number
 });
