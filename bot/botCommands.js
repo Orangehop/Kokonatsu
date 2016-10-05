@@ -1,7 +1,7 @@
 var request = require('request');
 
 var mongoose = require('mongoose');
-var Macro = mongoose.model('TestMacro');
+var Macro = mongoose.model('macro');
 
 var macro = function (msg, tags) {
     let guildID = msg.channel.guild.id;
