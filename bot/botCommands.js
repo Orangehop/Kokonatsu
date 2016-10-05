@@ -7,15 +7,16 @@ var macro = function (msg, tags) {
     let guildID = msg.channel.guild.id;
     var command = tags[0];
     var tagLength = tags.length
-    if (command == "add" && tagLength == 3) {
+    if (command == "add"){
+        if(!validTags(tags.slice(1), ["string", "string", 2, 2])) return;
+
         var name = tags[1].toLowerCase();
         var link = tags[2];
 
         Macro.find({name: name, guild: guildID}).
         then(function(macros){
-            var number;
+            var number = 0;
             if(macros.length > 0) number = macros.length;
-            else number = 0;
             Macro.create({
                 name: name,
                 guild: guildID,
@@ -29,12 +30,12 @@ var macro = function (msg, tags) {
             });
         });
     }
-    // add back list command when website is done
-    // else if (tags[0] == "list") {
-    //     msg.channel.sendMessage("view all the macros here: http://kokonatsu.herokuapp.com");
-    // }
+    else if (tags[0] == "list") {
+        if(!validTags(tags.slice(1), [], 0, 0)) return;
+        msg.channel.sendMessage("view all the macros here: http://kokonatsu.herokuapp.com");
+    }
     else if (tags[0] == "rename"){
-        if(!validTags(tags, ["string", "string", "string"], 3, 3)) return false;
+        if(!validTags(tags.slice(1), ["string", "string"], 2, 2)) return false;
 
         var name = tags[1].toLowerCase();
         var newName = tags[2].toLowerCase();
@@ -67,7 +68,7 @@ var macro = function (msg, tags) {
         });
     }
     else if (command == "top") {
-        if(!validTags(tags, ["string", "int"], 1, 2)) return;
+        if(!validTags(tags.slice(1), ["int"], 0, 1)) return;
 
         var limitNumber;
         if(tags.length > 1) limitNumber = parseInt(tags[1]);
@@ -94,7 +95,7 @@ var macro = function (msg, tags) {
     //     });
     // }
     else if (tags[0] == "delete" || tags[0] == "remove"){
-        if(!validTags(tags, ["string", "string", "int"], 2, 3)) return;
+        if(!validTags(tags.slice(1), ["string", "int"], 1, 2)) return;
 
         var name = tags[1].toLowerCase();
         var macroNumber;
