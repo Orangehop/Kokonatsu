@@ -21,10 +21,8 @@ var macro = function (msg, tags) {
                 guild: guildID,
                 number: number,
                 link: link,
-                voters: [],
                 score: 0,
                 usage: 0,
-                favorites: 0
             }).
             then(function(newMacro){
                 msg.channel.sendMessage(name+" "+(number+1)+"\n"+link);
@@ -81,79 +79,42 @@ var macro = function (msg, tags) {
                     "```Name:\t\t\t\t\tScore:\n" + resultString + "```");
         });
     }
-    // else if (tags[0] == "usage" && tags[1] != null) {
-    //     macros.findOne({guild: guildID, macro: tags[1]}, function (err, macro) {
-    //         if (macro) {
-    //             msg.channel.sendMessage(":heart: The macro \'" + tags[1] + "\' has been used " + macro.usage + " times! :heart:");
-    //         } else {
-    //             msg.channel.sendMessage("Enter a proper macro name, you fucking dumb piece of shit. Oops, I mean you baka!");
-    //         }
-    //     });
-    // }
-    // else if ((tags[0] == "delete" || tags[0] == "remove") && (tags.length == 2 || tags.length == 3)) {
-    //     tags[1] = tags[1].toLowerCase();
-    //     var searchText;
-    //     macros.findOne({
-    //         guild: guildID,
-    //         macro: tags[1]
-    //     }, function (err, macro) {
-    //         if (macro){
-    //             searchText = macro.links;
-    //         }
-    //         else {
-    //             msg.channel.sendMessage(tags[1] + " doesn't exist");
-    //             return;
-    //         }
+    else if (command == "usage" && tagLength == 2) {
+        var name = tags[1];
+        macros.findOne({guild: guildID, macro: name}, function (err, macro) {
+            if (macro) {
+                msg.channel.sendMessage(":heart: The macro \'" + tags[1] + "\' has been used " + macro.usage + " times! :heart:");
+            } else {
+                msg.channel.sendMessage("Enter a proper macro name, you fucking dumb piece of shit. Oops, I mean you baka!");
+            }
+        });
+    }
+    else if ((tags[0] == "delete" || tags[0] == "remove") && (tagLength >= 2) ){
+        var name = tags[1].toLowerCase();
+        var macroNumber;
+        if(tags[2] && parseInt(tags[2])) macroNumber = parseInt(tags[2]) - 1;
+        else macroNumber = 0;
 
-    //         if (searchText.length > 1) {
-    //             if (!tags[2] || parseInt(tags[2]) == NaN) {
-    //                 msg.channel.sendMessage("macro has more than one link, please specify which link to delete");
-    //                 return;
-    //             }
-
-    //             if (parseInt(tags[2]) - 1 > macro.links.length) {
-    //                 msg.channel.sendMessage(tags[1] + " " + tags[2] + ' does not exist');
-    //                 return;
-    //             }
-
-    //             var linkToRemove = macro.links[parseInt(tags[2]) - 1];
-
-    //             macros.findOneAndUpdate({
-    //                     guild: guildID,
-    //                     macro: tags[1]
-    //                 }, {
-    //                     $pull: {
-    //                        links: linkToRemove
-    //                     }
-    //                 }, {
-    //               returnNewDocument: false
-    //             },
-    //                 function (err, res) {
-    //                 if (err) {
-    //                     console.log(err);
-    //                 }
-    //                 console.log(res);
-    //                     let macro = res.value;
-    //                     if (res.ok == 1 && macro) {
-    //                         msg.channel.sendMessage("Deleted macro " + macro.macro + " " + linkToRemove);
-    //                     }
-
-    //                 });
-    //         } else {
-    //             macros.findOneAndDelete({
-    //                     guild: guildID,
-    //                     macro: tags[1]
-    //                 },
-    //                 function (err, res) {
-    //                     let macro = res.value;
-    //                     if (res.ok == 1 && macro) {
-    //                         msg.channel.sendMessage("Deleted macro " + macro.macro + " " + macro.links[0]);
-    //                     }
-
-    //                 });
-    //         }
-    //     });
-    // }
+        Macro.find({guild: guildID, name: name}).
+        then(function(macros){
+            if(macros.length <= macroNumber){
+                msg.channel.sendMessage(name + " " + macroNumber + ' does not exist');
+                return;
+            }
+            macros.forEach(function(macro){
+                if(macro.number == macroNumber){
+                    macro.remove().
+                    then(function(deletedMacro){
+                        msg.channel.sendMessage(deletedMacro.name+" "+(deletedMacro.number+1)+" has been deleted\n"+deletedMacro.link);
+                    });
+                }
+                else if(macro.number > macroNumber){
+                    macro.number = macro.number - 1;
+                    macro.save();
+                }
+            });
+        });
+    }
 };
 
 // var quickMacro = function (msg, macroName, tags) {

@@ -5,10 +5,8 @@ var MacroSchema = new mongoose.Schema({
     guild: String,
     number: Number,
     link: String,
-    voters: [String],
     score: Number,
     usage: Number,
-    favorites: Number
 });
 
 mongoose.model('TestMacro', MacroSchema);
