@@ -9,4 +9,4 @@ var MacroSchema = new mongoose.Schema({
     usage: Number,
 });
 
-mongoose.model('TestMacro', MacroSchema);
+mongoose.model('macro', MacroSchema);
