@@ -4,29 +4,19 @@ var botCommands = require('./botCommands');
 var bot = new Discord.Client();
 
 bot.on("message", msg => {
-    let prefix = process.env.PREFIX;
-    var command;
-    if(!(msg.content.startsWith(prefix.toLowerCase()) || msg.content.startsWith(prefix.toUpperCase())) || msg.author.bot || msg.content.length <= prefix.length) return;
-    else command = msg.content.split("!")[1].split(" ")[0];
-    console.log(msg.content);
-
-    var tags = msg.content.split(" ");
-    tags.shift();
-
-    if (command == "echo") {
-        botCommands.echo(msg);
+    var prefix = checkPrefix(msg.content);
+    if(prefix == -1) return;
+    else if(prefix == 1){
+        console.log(msg.content);
+        var command = msg.content.split("@")[1].split(" ")[0];
+        var tags = msg.content.split(" ").slice(1);
+        botCommands.config(msg, command, tags);
     }
-    else if(command == "gif") {
-        botCommands.gif(msg, tags);
-    }
-    else if(command == "macro") {
-        botCommands.macro(msg, tags);
-    }
-    else if(command == "help"){
-        botCommands.help(msg, tags);
-    }
-    else{
-        botCommands.quickMacro(msg, command, tags);
+    else if(prefix == 2){
+        console.log(msg.content);
+        var name = msg.content.split("!")[1].split(" ")[0];
+        var number = msg.content.split(" ").slice(1)[0];
+        botCommands.macro(msg, name, number);
     }
 });
 
@@ -35,3 +25,12 @@ bot.on('ready', () => {
 });
 
 bot.login(process.env.BOTTOKEN);
+
+var checkPrefix = function(msg){
+    var macroPrefix = process.env.PREFIX;
+    var configPrefix = process.env.CONFIGPREFIX;
+    var prefix = msg.slice(0, macroPrefix.length).toLowerCase();
+    if(prefix == macroPrefix) return 2
+    else if(prefix == configPrefix) return 1;
+    else return -1;
+}

@@ -3,15 +3,19 @@ var request = require('request');
 var mongoose = require('mongoose');
 var Macro = mongoose.model('macro');
 
-var macro = function (msg, tags) {
-    let guildID = msg.channel.guild.id;
-    var command = tags[0];
-    var tagLength = tags.length
-    if (command == "add"){
-        if(!validTags(tags.slice(1), ["string", "string", 2, 2])) return;
+var helpMsgs = require('./helpMessages');
 
-        var name = tags[1].toLowerCase();
-        var link = tags[2];
+var config = function (msg, command, tags) {
+    console.log(tags);
+    console.log(command);
+    let guildID = msg.channel.guild.id;
+    var tagLength = tags.length
+
+    if (command == "add"){
+        if(!validTags(tags, ["string", "string", 2, 2])) return;
+
+        var name = tags[0].toLowerCase();
+        var link = tags[1];
 
         Macro.find({name: name, guild: guildID}).
         then(function(macros){
@@ -30,15 +34,17 @@ var macro = function (msg, tags) {
             });
         });
     }
-    else if (tags[0] == "list") {
-        if(!validTags(tags.slice(1), [], 0, 0)) return;
+
+    else if (command == "list") {
+        if(!validTags(tags, [], 0, 0)) return;
         msg.channel.sendMessage("view all the macros here: http://kokonatsu.herokuapp.com");
     }
-    else if (tags[0] == "rename"){
-        if(!validTags(tags.slice(1), ["string", "string"], 2, 2)) return false;
 
-        var name = tags[1].toLowerCase();
-        var newName = tags[2].toLowerCase();
+    else if (command == "rename"){
+        if(!validTags(tags, ["string", "string"], 2, 2)) return false;
+
+        var name = tags[0].toLowerCase();
+        var newName = tags[1].toLowerCase();
         Macro.find({
             guild: guildID,
             name: newName,
@@ -62,16 +68,17 @@ var macro = function (msg, tags) {
                         macro.save();
                     });
 
-                    msg.channel.sendMessage(":ok_hand: Macro \'" + tags[1] + "\' has been renamed to \'" + tags[2]+"\'!");
+                    msg.channel.sendMessage(":ok_hand: Macro \'" + name + "\' has been renamed to \'" + newName+"\'!");
                 });
             }
         });
     }
+
     else if (command == "top") {
-        if(!validTags(tags.slice(1), ["int"], 0, 1)) return;
+        if(!validTags(tags, ["int"], 0, 1)) return;
 
         var limitNumber;
-        if(tags.length > 1) limitNumber = parseInt(tags[1]);
+        if(tags.length > 0) limitNumber = parseInt(tags[0]);
         else limitNumber = 10;
 
         Macro.find({guild: guildID}).sort({score: -1}).limit(limitNumber).exec().
@@ -84,6 +91,7 @@ var macro = function (msg, tags) {
                     "```Name:\t\t\t\t\tScore:\n" + resultString + "```");
         });
     }
+
     // else if (command == "usage" && tagLength == 2) {
     //     var name = tags[1];
     //     macros.findOne({guild: guildID, macro: name}, function (err, macro) {
@@ -94,12 +102,13 @@ var macro = function (msg, tags) {
     //         }
     //     });
     // }
-    else if (tags[0] == "delete" || tags[0] == "remove"){
-        if(!validTags(tags.slice(1), ["string", "int"], 1, 2)) return;
 
-        var name = tags[1].toLowerCase();
+    else if (command == "delete" || command == "remove"){
+        if(!validTags(tags, ["string", "int"], 1, 2)) return;
+
+        var name = tags[0].toLowerCase();
         var macroNumber;
-        if(tags.length > 2) macroNumber = parseInt(tags[2]);
+        if(tags.length > 1) macroNumber = parseInt(tags[1]);
         else macroNumber = 1;
 
         Macro.find({guild: guildID, name: name}).
@@ -122,12 +131,17 @@ var macro = function (msg, tags) {
             });
         });
     }
+
+    else if (command == "help"){
+        if(typeof(tags[0]) == "undefined") return msg.channel.sendMessage(helpMsgs.quickHelp);
+
+        if(tags[0] == "config"){
+            if(typeof(tags[1]) == "undefined") return msg.channel.sendMessage(helpMsgs.configHelp);
+        }
+    }
 };
 
-var quickMacro = function (msg, name, tags) {
-    if(!validTags(tags, ["int"], 0, 1)) return;
-    console.log(name);
-
+var macro = function (msg, name, number){
     let guildID = msg.channel.guild.id;
 
     Macro.find({guild: guildID, name: name}).sort({number: 1}).
@@ -135,18 +149,19 @@ var quickMacro = function (msg, name, tags) {
         if(macros.length == 0) return msg.channel.sendMessage(name+' does not exist');
 
         var message="";
-
-        var macroNumber;
-        if(tags.length > 0) macroNumber = parseInt(tags[0]) - 1;
+        if(typeof(number) == "undefined"){
+            number = Math.floor(Math.random() * macros.length);
+            message = (number+1)+"/"+macros.length+"\n";
+        }
         else{
-            macroNumber = Math.floor(Math.random() * macros.length);
-            message = (macroNumber+1)+"/"+macros.length+"\n";
+            if(isNaN(parseInt(number))) return;
+            number = parseInt(number) - 1;
         }
 
-        if(macroNumber  < 0 || macroNumber > macros.length) return msg.channel.sendMessage(name+' '+macroNumber+' does not exist');
-        msg.channel.sendMessage(message+macros[macroNumber].link);
-        macros[macroNumber].usage = macros[macroNumber].usage + 1;
-        macros[macroNumber].save();
+        if(number  < 0 || number >= macros.length) return msg.channel.sendMessage(name+' '+(number+1)+' does not exist');
+        msg.channel.sendMessage(message+macros[number].link);
+        macros[number].usage = macros[number].usage + 1;
+        macros[number].save();
     });
 }
 
@@ -165,41 +180,5 @@ var validTags = function(tags, types, minLength, maxLength){
     return valid;
 }
 
-var echo = function (msg) {
-    var args = msg.content.substr(msg.content.indexOf(" ") + 1);
-    msg.channel.sendMessage(args);
-};
-
-var gif = function (msg, tags) {
-    console.log(tags);
-    request.get({
-        "url": "http://api.giphy.com/v1/gifs/random?api_key=dc6zaTOxFJmzC&tag=" + tags
-    }, function (err, res, body) {
-        msg.channel.sendMessage(JSON.parse(body).data.url);
-    });
-};
-
-var help = function (msg, tags){
-    console.log(tags);
-    if (tags.length != 1) return;
-    var HelpCommands = {macro: 0};
-    var helpNo = HelpCommands[tags[0]];
-    HelpMessage = [
-"Kokonatsu Help Menu \n\n\
-Macro: __Outputs a link when a recorded macro is typed__ \n\n\
-Config Usage: k!macro add <macroName> <link> | delete <macroName> <macroNumber> | list \n\
-Output Usage: k!<macroName> <optional macroNumber> \n\n\
-Examples: \n\
-`k!macro add clap http://i.imgur.com/ezHbFKc.gif` adds the link to the macro clap \n\
-`k!clap #` outputs the macro's link. If no # is specified then a random link from the macro will be played \n\
-`k!macro delete clap #` deletes link number # from the macro. If the macro has only one link than the entire macro is deleted"
-];
-    console.log(HelpMessage[helpNo]);
-    msg.channel.sendMessage(HelpMessage[helpNo]);
-}
-
 module.exports.macro = macro;
-module.exports.quickMacro = quickMacro;
-module.exports.echo = echo;
-module.exports.gif = gif;
-module.exports.help = help;
+module.exports.config = config;
