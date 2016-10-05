@@ -126,6 +126,7 @@ var macro = function (msg, tags) {
 
 var quickMacro = function (msg, name, tags) {
     if(!validTags(tags, ["int"], 0, 1)) return;
+    console.log(name);
 
     let guildID = msg.channel.guild.id;
 
@@ -136,14 +137,13 @@ var quickMacro = function (msg, name, tags) {
         var message="";
 
         var macroNumber;
-        if(tags.length > 0) macroNumber = parseInt(tags[0]);
+        if(tags.length > 0) macroNumber = parseInt(tags[0]) - 1;
         else{
             macroNumber = Math.floor(Math.random() * macros.length);
-            message = macroNumber+"/"+macros.length+"\n";
+            message = (macroNumber+1)+"/"+macros.length+"\n";
         }
 
         if(macroNumber  < 0 || macroNumber > macros.length) return msg.channel.sendMessage(name+' '+macroNumber+' does not exist');
-        macroNumber--;
         msg.channel.sendMessage(message+macros[macroNumber].link);
         macros[macroNumber].usage = macros[macroNumber].usage + 1;
         macros[macroNumber].save();
