@@ -19,7 +19,7 @@ var config = function (msg, command, tags) {
 
         Macro.find({name: name, guild: guildID}).
         then(function(macros){
-            var number = 0;
+            var number = 1;
             if(macros.length > 0) number = macros.length;
             Macro.create({
                 name: name,
