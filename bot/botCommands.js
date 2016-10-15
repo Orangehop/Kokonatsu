@@ -92,6 +92,10 @@ var config = function (msg, command, tags) {
             type = "Scoring";
             column = "Score:"
         }
+        else{
+            msg.channel.sendMessage("Set a proper top type b-b-b-baka!!!!!!");
+            return;
+        }
 
         var limitNumber;
         if(tags.length > 1) limitNumber = parseInt(tags[1]);
@@ -104,7 +108,7 @@ var config = function (msg, command, tags) {
                 var result;
                 if(sortKey == "usage") result = macro.usage;
                 else if(sortKey == "score") result = macro.score;
-                resultString += macro.name + ("                          " + result).slice(macro.name.length) + "\n";
+                resultString += macro.name+ "(" + macro.number + ")" + ("                          " + result).slice(macro.name.length) + "\n";
             });
             msg.channel.sendMessage("The Top "+limitNumber+" "+type+" Macros!\n" +
                     "```Name:\t\t\t\t\t"+column+"\n" + resultString + "```");
@@ -151,7 +155,7 @@ var config = function (msg, command, tags) {
 
             var response = ":heart: The macro \'" + name;
             if(tags.length > 1) response += (" ("+tags[1]+")");
-            response += " has been used "+totalUsage+" times! :heart:";
+            response += " has a score of  "+totalScore+"! :heart:";
 
             msg.channel.sendMessage(response);
         });
