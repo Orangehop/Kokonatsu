@@ -8,8 +8,8 @@ var UserSchema = new mongoose.Schema({
     avatar: String,
     accessToken: String,
     refreshToken: String,
-    likes: [{type: Schema.Types.ObjectId, ref: 'Macro'}],
-    dislikes: [{type: Schema.Types.ObjectId, ref: 'Macro'}]
+    likes: [{type: Schema.Types.ObjectId, ref: 'macro'}],
+    dislikes: [{type: Schema.Types.ObjectId, ref: 'macro'}]
 });
 
 mongoose.model('user', UserSchema);

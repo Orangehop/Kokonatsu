@@ -169,7 +169,7 @@ var config = function (msg, command, tags) {
         if(tags.length > 1) macroNumber = parseInt(tags[1]);
         else macroNumber = 1;
 
-        Macro.find({guild: guildID, name: name}).
+        Macro.find({guild: guildID, name: name}).populate("likes dislikes").exec().
         then(function(macros){
             if(macros.length < macroNumber){
                 msg.channel.sendMessage(name + " " + macroNumber + ' does not exist');
@@ -177,6 +177,16 @@ var config = function (msg, command, tags) {
             }
             macros.forEach(function(macro){
                 if(macro.number == macroNumber){
+                    macro.likes.forEach(function(user){
+                        var index = user.likes.indexOf(macro._id);
+                        user.likes.splice(index, 1);
+                        user.save();
+                    });
+                    macro.dislikes.forEach(function(user){
+                        var index = user.dislikes.indexOf(macro._id);
+                        user.likes.splice(index, 1);
+                        user.save();
+                    });
                     macro.remove().
                     then(function(deletedMacro){
                         msg.channel.sendMessage(deletedMacro.name+" "+deletedMacro.number+" has been deleted\n"+deletedMacro.link);
@@ -224,6 +234,7 @@ var config = function (msg, command, tags) {
 
                 dbUser.likes.push(macro._id);
                 dbUser.save();
+                macro.likes.push(dbUser._id);
                 change += 1;
             }
             else if(modifier == "down"){
@@ -239,6 +250,7 @@ var config = function (msg, command, tags) {
 
                 dbUser.dislikes.push(macro._id);
                 dbUser.save();
+                macro.dislikes.push(dbUser._id);
                 change -= 1;
             }
 
