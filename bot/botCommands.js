@@ -256,7 +256,7 @@ var config = function (msg, command, tags) {
 
             macro.score += change;
             macro.save();
-            msg.channel.sendMessage(macro.name+" score has been updated to "+ macro.score);
+            msg.channel.sendMessage(macro.name+" ("+macro.number+") score has been updated to "+ macro.score);
         });
     }
 
