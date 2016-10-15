@@ -2,6 +2,7 @@ var request = require('request');
 
 var mongoose = require('mongoose');
 var Macro = mongoose.model('macro');
+var User = mongoose.model('user');
 
 var helpMsgs = require('./helpMessages');
 
@@ -182,6 +183,64 @@ var config = function (msg, command, tags) {
                     macro.save();
                 }
             });
+        });
+    }
+
+    else if(command == "vote"){
+        if(!validTags(tags, ["string", "string", "int"], 3, 3)) return;
+
+        var modifier = tags[0];
+        var name = tags[1];
+        var number = tags[2];
+        var change = 0;
+        var author = msg.author;
+        var dbUser;
+
+        User.findOneAndUpdate({discordId: author.id},
+                                              {username: author.username,
+                                                discriminator: author.discriminator,
+                                                avatar: author.avatar},
+                                              {upsert: true,
+                                                new: true}).
+        then(function(user){
+            dbUser = user;
+            return Macro.findOne({name: name, number: number, guild: guildID})
+        }).
+        then(function(macro){
+            if(modifier == "up"){
+                if(dbUser.likes.indexOf(macro.id) != -1){
+                    msg.channel.sendMessage("You've already liked this post");
+                    return;
+                }
+
+                if(dbUser.dislikes.indexOf(macro.id) != -1){
+                    dbUser.dislikes.splice(dbUser.dislikes.indexOf(macro.id), 1);
+                    change += 1;
+                }
+
+                dbUser.likes.push(macro._id);
+                dbUser.save();
+                change += 1;
+            }
+            else if(modifier == "down"){
+                if(dbUser.dislikes.indexOf(macro.id) != -1){
+                    msg.channel.sendMessage("You've already disliked this post");
+                    return;
+                }
+
+                if(dbUser.likes.indexOf(macro.id) != -1){
+                    dbUser.likes.splice(dbUser.likes.indexOf(macro.id), 1);
+                    change -= 1;
+                }
+
+                dbUser.dislikes.push(macro._id);
+                dbUser.save();
+                change -= 1;
+            }
+
+            macro.score += change;
+            macro.save();
+            msg.channel.sendMessage(macro.name+" score has been updated to "+ macro.score);
         });
     }
 
