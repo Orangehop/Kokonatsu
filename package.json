@@ -18,6 +18,8 @@
     "express-session": "*",
     "mongoose": "^4.6.2",
     "morgan": "~1.7.0",
+    "passport": "^0.3.2",
+    "passport-oauth": "^1.0.0",
     "request": "*",
     "serve-favicon": "^2.3.0"
   }
