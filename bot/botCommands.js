@@ -75,33 +75,86 @@ var config = function (msg, command, tags) {
     }
 
     else if (command == "top") {
-        if(!validTags(tags, ["int"], 0, 1)) return;
+        if(!validTags(tags, ["string", "int"], 1, 2)) return;
+
+        var sortKey = tags[0];
+        var sortOption = {};
+        var type = "";
+        var column = "";
+        if(sortKey == "usage"){
+            sortOption.usage = -1;
+            type = "Used";
+            column = "Usage:"
+        }
+        else if(sortKey == "score"){
+            sortOption.score = -1;
+            type = "Scoring";
+            column = "Score:"
+        }
 
         var limitNumber;
-        if(tags.length > 0) limitNumber = parseInt(tags[0]);
+        if(tags.length > 1) limitNumber = parseInt(tags[1]);
         else limitNumber = 10;
 
-        Macro.find({guild: guildID}).sort({score: -1}).limit(limitNumber).exec().
+        Macro.find({guild: guildID}).sort(sortOption).limit(limitNumber).exec().
         then(function(macros){
             let resultString = "";
             macros.forEach(function(macro){
-                resultString += macro.name + ("                          " + macro.score).slice(macro.name.length) + "\n";
+                var result;
+                if(sortKey == "usage") result = macro.usage;
+                else if(sortKey == "score") result = macro.score;
+                resultString += macro.name + ("                          " + result).slice(macro.name.length) + "\n";
             });
-            msg.channel.sendMessage("The Top " + limitNumber + " Used Macros!\n" +
-                    "```Name:\t\t\t\t\tScore:\n" + resultString + "```");
+            msg.channel.sendMessage("The Top "+limitNumber+" "+type+" Macros!\n" +
+                    "```Name:\t\t\t\t\t"+column+"\n" + resultString + "```");
         });
     }
 
-    // else if (command == "usage" && tagLength == 2) {
-    //     var name = tags[1];
-    //     macros.findOne({guild: guildID, macro: name}, function (err, macro) {
-    //         if (macro) {
-    //             msg.channel.sendMessage(":heart: The macro \'" + tags[1] + "\' has been used " + macro.usage + " times! :heart:");
-    //         } else {
-    //             msg.channel.sendMessage("Enter a proper macro name, you fucking dumb piece of shit. Oops, I mean you baka!");
-    //         }
-    //     });
-    // }
+    else if (command == "usage") {
+        if(!validTags(tags, ["string", "int"], 1, 2)) return;
+
+        var name = tags[0];
+        var searchOptions = {guild: guildID, name: name};
+        if(tags.length > 1) searchOptions.number = tags[1];
+        Macro.find(searchOptions).
+        then(function(macros){
+            if(macros.length == 0) return msg.channel.sendMessage("Enter a proper macro name, you fucking dumb piece of shit. Oops, I mean you baka!");
+
+            var totalUsage = 0;
+            macros.forEach(function(macro){
+                totalUsage += macro.usage;
+            });
+
+            var response = ":heart: The macro \'" + name;
+            if(tags.length > 1) response += (" ("+tags[1]+")");
+            response += " has been used "+totalUsage+" times! :heart:";
+
+            msg.channel.sendMessage(response);
+        });
+    }
+
+    else if (command == "score") {
+        if(!validTags(tags, ["string", "int"], 1, 2)) return;
+
+        var name = tags[0];
+        var searchOptions = {guild: guildID, name: name};
+        if(tags.length > 1) searchOptions.number = tags[1];
+        Macro.find(searchOptions).
+        then(function(macros){
+            if(macros.length == 0) return msg.channel.sendMessage("Enter a proper macro name, you fucking dumb piece of shit. Oops, I mean you baka!");
+
+            var totalScore = 0;
+            macros.forEach(function(macro){
+                totalScore += macro.score;
+            });
+
+            var response = ":heart: The macro \'" + name;
+            if(tags.length > 1) response += (" ("+tags[1]+")");
+            response += " has been used "+totalUsage+" times! :heart:";
+
+            msg.channel.sendMessage(response);
+        });
+    }
 
     else if (command == "delete" || command == "remove"){
         if(!validTags(tags, ["string", "int"], 1, 2)) return;
