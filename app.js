@@ -18,6 +18,7 @@ require('./config/passport');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
+var api = require('./routes/api');
 
 mongoose.connect(process.env.KOKONATSUDB);
 
@@ -43,6 +44,7 @@ app.use(passport.session());
 
 app.use('/', routes);
 app.use('/users', users);
+app.use('/api', api);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -6,7 +6,7 @@ app.factory('macros', ['$http', function($http){
         macros: []
     };
 
-    $http.get("/getmacros").success(function(data){
+    $http.get("/api/macros").success(function(data){
         macros = [];
         angular.copy(data.guilds, o.guilds);
         data.macros.forEach(function(macro){
@@ -21,14 +21,29 @@ app.factory('macros', ['$http', function($http){
     return o;
 }]);
 
+app.factory('user', ['$http', function($http){
+    var o = {
+        user: {}
+    };
+
+    $http.get("/api/user").success(function(data){
+        angular.copy(data.user, o.user);
+    });
+
+    return o;
+}]);
+
 app.controller('MainCtrl', [
+'$http',
 '$sce',
 '$scope',
 'macros',
-function($sce, $scope, macros){
+'user',
+function($http, $sce, $scope, macros, user){
     $scope.macros = macros.macros;
     $scope.guilds = macros.guilds;
     $scope.displayMacros = $scope.macros;
+    $scope.user = user.user;
 
     $scope.alphabet = ["ALL","#","?","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
     $scope.displayLetter;
@@ -118,6 +133,31 @@ function($sce, $scope, macros){
     $scope.setGuild = function(guildId, index){
         $scope.guildFilter = guildId;
         $scope.currentTab = index;
+    }
+
+    $scope.updateButton = function(userIds){
+        var exists = false;
+        userIds.forEach(function(userId){
+            if(userId == $scope.user._id) exists = true;
+        });
+
+        return exists;
+    }
+
+    $scope.like = function(macro){
+        $http.put('/api/like/'+macro._id).success(function(updatedMacro){
+            macro.score = updatedMacro.score;
+            macro.likes = updatedMacro.likes;
+            macro.dislikes = updatedMacro.dislikes;
+        });
+    }
+
+    $scope.dislike = function(macro){
+        $http.put('/api/dislike/'+macro._id).success(function(updatedMacro){
+            macro.score = updatedMacro.score;
+            macro.likes = updatedMacro.likes;
+            macro.dislikes = updatedMacro.dislikes;
+        });
     }
 }]);
 

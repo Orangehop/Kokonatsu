@@ -229,6 +229,7 @@ var config = function (msg, command, tags) {
 
                 if(dbUser.dislikes.indexOf(macro.id) != -1){
                     dbUser.dislikes.splice(dbUser.dislikes.indexOf(macro.id), 1);
+                    macro.dislikes.splice(macro.dislikes.indexOf(user.id), 1);
                     change += 1;
                 }
 
@@ -245,6 +246,7 @@ var config = function (msg, command, tags) {
 
                 if(dbUser.likes.indexOf(macro.id) != -1){
                     dbUser.likes.splice(dbUser.likes.indexOf(macro.id), 1);
+                    macro.likes.splice(macro.likes.indexOf(user.id), 1);
                     change -= 1;
                 }
 
