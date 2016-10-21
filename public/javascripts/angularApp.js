@@ -89,6 +89,7 @@ function($http, $sce, $scope, macros, user){
     }
 
     $scope.filterAlphabet = function(letter){
+        $scope.displayLetter = letter;
         if(letter == "ALL"){
             $scope.displayMacros = $scope.macros;
         }
