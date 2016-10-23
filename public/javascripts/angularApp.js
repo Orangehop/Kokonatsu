@@ -148,6 +148,7 @@ function($http, $sce, $scope, macros, user){
 
     $scope.like = function(macro){
         $http.put('/api/like/'+macro._id).success(function(updatedMacro){
+            if(updatedMacro == null) return;
             macro.score = updatedMacro.score;
             macro.likes = updatedMacro.likes;
             macro.dislikes = updatedMacro.dislikes;
@@ -156,6 +157,7 @@ function($http, $sce, $scope, macros, user){
 
     $scope.dislike = function(macro){
         $http.put('/api/dislike/'+macro._id).success(function(updatedMacro){
+            if(updatedMacro == null) return;
             macro.score = updatedMacro.score;
             macro.likes = updatedMacro.likes;
             macro.dislikes = updatedMacro.dislikes;

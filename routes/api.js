@@ -74,6 +74,8 @@ router.put('/like/:macroId', isAuthenticated, function(req, res, next){
     var macro = req.macro;
     var user = req.user;
 
+    if(macro == null) return req.macro = null;
+
     if(user.likes.indexOf(macro._id) != -1){
         return res.json(macro);
     }
@@ -95,6 +97,8 @@ router.put('/like/:macroId', isAuthenticated, function(req, res, next){
 router.put('/dislike/:macroId', isAuthenticated, function(req, res, next){
     var macro = req.macro;
     var user = req.user;
+
+    if(macro == null) return req.macro = null;
 
     if(user.dislikes.indexOf(macro._id) != -1){
         return res.json(macro);
