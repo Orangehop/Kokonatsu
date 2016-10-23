@@ -115,6 +115,46 @@ var config = function (msg, command, tags) {
         });
     }
 
+    else if (command == "bottom") {
+        if(!validTags(tags, ["string", "int"], 1, 2)) return;
+
+        var sortKey = tags[0];
+        var sortOption = {};
+        var type = "";
+        var column = "";
+        if(sortKey == "usage"){
+            sortOption.usage = 1;
+            type = "Used";
+            column = "Usage:"
+        }
+        else if(sortKey == "score"){
+            sortOption.score = 1;
+            type = "Scoring";
+            column = "Score:"
+        }
+        else{
+            msg.channel.sendMessage("Set a proper top type b-b-b-baka!!!!!!");
+            return;
+        }
+
+        var limitNumber;
+        if(tags.length > 1) limitNumber = parseInt(tags[1]);
+        else limitNumber = 10;
+
+        Macro.find({guild: guildID}).sort(sortOption).limit(limitNumber).exec().
+        then(function(macros){
+            let resultString = "";
+            macros.forEach(function(macro){
+                var result;
+                if(sortKey == "usage") result = macro.usage;
+                else if(sortKey == "score") result = macro.score;
+                resultString += macro.name+ "(" + macro.number + ")" + ("                          " + result).slice(macro.name.length) + "\n";
+            });
+            msg.channel.sendMessage("The Top "+limitNumber+" "+type+" Macros!\n" +
+                    "```Name:\t\t\t\t\t"+column+"\n" + resultString + "```");
+        });
+    }
+
     else if (command == "usage") {
         if(!validTags(tags, ["string", "int"], 1, 2)) return;
 
