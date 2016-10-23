@@ -262,14 +262,14 @@ var config = function (msg, command, tags) {
         }).
         then(function(macro){
             if(modifier == "up"){
-                if(dbUser.likes.indexOf(macro.id) != -1){
+                if(dbUser.likes.indexOf(macro._id) != -1){
                     msg.channel.sendMessage("You've already liked this post");
                     return;
                 }
 
-                if(dbUser.dislikes.indexOf(macro.id) != -1){
-                    dbUser.dislikes.splice(dbUser.dislikes.indexOf(macro.id), 1);
-                    macro.dislikes.splice(macro.dislikes.indexOf(user.id), 1);
+                if(dbUser.dislikes.indexOf(macro._id) != -1){
+                    dbUser.dislikes.splice(dbUser.dislikes.indexOf(macro._id), 1);
+                    macro.dislikes.splice(macro.dislikes.indexOf(dbUser._id), 1);
                     change += 1;
                 }
 
@@ -279,14 +279,14 @@ var config = function (msg, command, tags) {
                 change += 1;
             }
             else if(modifier == "down"){
-                if(dbUser.dislikes.indexOf(macro.id) != -1){
+                if(dbUser.dislikes.indexOf(macro._id) != -1){
                     msg.channel.sendMessage("You've already disliked this post");
                     return;
                 }
 
-                if(dbUser.likes.indexOf(macro.id) != -1){
-                    dbUser.likes.splice(dbUser.likes.indexOf(macro.id), 1);
-                    macro.likes.splice(macro.likes.indexOf(user.id), 1);
+                if(dbUser.likes.indexOf(macro._id) != -1){
+                    dbUser.likes.splice(dbUser.likes.indexOf(macro._id), 1);
+                    macro.likes.splice(macro.likes.indexOf(dbUser._id), 1);
                     change -= 1;
                 }
 
