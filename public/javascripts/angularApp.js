@@ -48,7 +48,7 @@ function($http, $sce, $scope, macros, user){
     $scope.alphabet = ["ALL","#","?","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
     $scope.displayLetter;
 
-    $scope.sortKeys = ["Macro Names", "Usage"];
+    $scope.sortKeys = ["Macro Names", "Usage", "Score"];
     $scope.sortKey;
 
     $scope.guildFilter;
@@ -127,6 +127,7 @@ function($http, $sce, $scope, macros, user){
         var sortTerm;
         if(key == "Macro Names") sortTerm = 'name';
         else if(key == "Usage") sortTerm = '-usage';
+        else if(key == "Score") sortTerm = '-score';
         $scope.sortKey = sortTerm;
         $scope.currentPage = 1;
     }
