@@ -74,48 +74,33 @@ router.put('/like/:macroId', isAuthenticated, function(req, res, next){
     var macro = req.macro;
     var user = req.user;
 
-    if(macro == null) return req.macro = null;
+    if (macro == null) return res.json(null)
 
-    if(user.likes.indexOf(macro._id) != -1){
-        return res.json(macro);
-    }
-
-    if(user.dislikes.indexOf(macro._id) != -1){
-        user.dislikes.splice(user.dislikes.indexOf(macro._id), 1);
-        macro.dislikes.splice(macro.dislikes.indexOf(user._id), 1);
-        macro.score += 1;
-    }
-
-    user.likes.push(macro._id);
-    user.save();
-    macro.likes.push(user._id);
-    macro.score += 1;
-    macro.save();
-    res.json(macro);
+    macro.like(user._id);
+    user.like(macro._id);
+    res.json({macro: macro, user: user});
 })
 
 router.put('/dislike/:macroId', isAuthenticated, function(req, res, next){
     var macro = req.macro;
     var user = req.user;
 
-    if(macro == null) return req.macro = null;
+    if (macro == null) return res.json(null)
 
-    if(user.dislikes.indexOf(macro._id) != -1){
-        return res.json(macro);
-    }
+    macro.dislike(user._id);
+    user.dislike(macro._id);
+    res.json({macro: macro, user: user});
+})
 
-    if(user.likes.indexOf(macro._id) != -1){
-        user.likes.splice(user.likes.indexOf(macro._id), 1);
-        macro.likes.splice(macro.likes.indexOf(user._id), 1);
-        macro.score -= 1;
-    }
+router.put('/neutral/:macroId', isAuthenticated, function(req, res, next){
+    var macro = req.macro;
+    var user = req.user;
 
-    user.dislikes.push(macro._id);
-    user.save();
-    macro.dislikes.push(user._id);
-    macro.score -= 1;
-    macro.save();
-    res.json(macro);
+    if (macro == null) return res.json(null)
+
+    macro.neutral(user._id);
+    user.neutral(macro._id);
+    res.json({macro: macro, user: user});
 })
 
 

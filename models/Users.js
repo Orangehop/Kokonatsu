@@ -12,4 +12,22 @@ var UserSchema = new mongoose.Schema({
     dislikes: [{type: Schema.Types.ObjectId, ref: 'macro'}]
 });
 
+UserSchema.methods.like = function(_macroId){
+    this.dislikes.pull(_macroId);
+    if(this.likes.indexOf(_macroId) == -1) this.likes.push(_macroId);
+    this.save();
+};
+
+UserSchema.methods.dislike = function(_macroId){
+    this.likes.pull(_macroId);
+    if(this.dislikes.indexOf(_macroId) == -1) this.dislikes.push(_macroId);
+    this.save();
+};
+
+UserSchema.methods.neutral = function(_macroId){
+    this.dislikes.pull(_macroId);
+    this.likes.pull(_macroId);
+    this.save();
+};
+
 mongoose.model('user', UserSchema);

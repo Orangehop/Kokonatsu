@@ -17,7 +17,7 @@
 
 
     </head>
-  <body ng-app="kokonatsu" ng-controller="MainCtrl" controller>
+  <body ng-app="kokonatsu"  ng-controller="MainCtrl" controller>
     <div class="row" align = "center">
       <h1>Kokonatsu Macros</h1>
     </div>
@@ -27,24 +27,24 @@
       <div class="row">
         <nav style="margin: 0 20px">
           <ul class="nav nav-tabs">
-            <li ng-repeat="guild in guilds" ng-click="setGuild(guild.id, $index)" ng-init="setGuild(guilds[0].id, 0)" ng-class="{'active': $index === currentTab}"><a href="">{{guild.name}}</a></li>
+            <li ng-repeat="guild in guilds" ng-click="setGuild($index)" ng-class="{'active': $index === currentTab}"><a href="">{{guild.name}}</a></li>
           </ul>
         </nav>
       </div>
     </div>
 
     <!-- Search Bar -->
-    <div class="container">
+    <div class="container" ng-controller="SearchCtrl">
       <form style="margin-top:15px">
         <div class="form-group row">
-          <div class="col-md-11"><input type="text" ng-model="search" ng-init="search='' " class="form-control" placeholder="Search"  ng-change="reloadGfycat()"></div>
+          <div class="col-md-11"><input type="text" ng-model="searchCtrl.filter" class="form-control" placeholder="Search"  ng-change="reloadGfycat()"></div>
           <div class="dropdown col-md-1">
             <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown">
               Sort By
               <span class="caret"></span>
             </button>
             <ul class="dropdown-menu">
-              <li ng-click="setSortKey(key)" ng-repeat="key in sortKeys"><a href="#">{{key}}</a></li>
+              <li ng-click="setSortKey(key)" ng-repeat="key in sortKeys"><a href="">{{key}}</a></li>
             </ul>
           </div>
         </div>
@@ -52,15 +52,15 @@
     </div>
 
     <!-- Alphabet Filter -->
-    <div class="container-fluid" ng-init="displayLetter='ALL'" align="center"><nav>
+    <div class="container-fluid" align="center"><nav>
       <div class="button-group btn-group-sm" ng-repeat="letter in alphabet" style="display:inline-block; margin: 0px 5px">
         <button type="button" class="btn" ng-class="{'btn-primary': letter==displayLetter, 'btn-default': letter != displayLetter}" ng-click="filterAlphabet(letter)">{{letter}}</button>
       </div>
     </nav></div>
 
     <!-- Macro Grid -->
-    <div class="container-fluid" align="center" ng-init="setSortKey('Macro Names')">
-      <span dir-paginate="macro in displayMacros | orderBy: [sortKey,'number'] | filter: {name: search, guild: guildFilter} | itemsPerPage: 12" current-page="currentPage" style="">
+    <div class="container-fluid" align="center" ng-controller="MacroCtrl">
+      <span dir-paginate="macro in displayMacros | orderBy: [searchCtrl.sortKey,'number'] | filter: {name: searchCtrl.filter, guild: guilds[currentTab].id} | itemsPerPage: 12" current-page="pagination.currentPage" style="">
          <div style="display:inline-block; margin: 0px 5px;">
           <div style=""><h3 style="padding: 0px; margin: 15px 0px 3px">{{macro.name}} ({{macro.number}})</h3></div>
           <div style="float:left; background-color:black; border-radius: 5px">

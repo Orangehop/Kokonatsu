@@ -33,6 +33,80 @@ app.factory('user', ['$http', function($http){
     return o;
 }]);
 
+app.controller('SearchCtrl', [
+'$scope',
+function($scope){
+    $scope.sortKeys = ["Macro Names", "Usage", "Score"];
+
+    $scope.setSortKey = function(key){
+        var sortTerm;
+        if(key == "Macro Names") sortTerm = 'name';
+        else if(key == "Usage") sortTerm = '-usage';
+        else if(key == "Score") sortTerm = '-score';
+        $scope.searchCtrl.sortKey = sortTerm;
+        $scope.pagination.currentPage = 1;
+    }
+
+    $scope.searchCtrl.filter;
+}]);
+
+app.controller('MacroCtrl',[
+'$http',
+'$scope',
+function($http, $scope){
+    $scope.video = function(link){
+        if(link.endsWith("mp4")) return true;
+        return false;
+    };
+
+    $scope.img = function(macro, link){
+        if(link.endsWith("mp4") || link.includes("gfycat.com")) return false;
+        return true;
+    };
+
+    $scope.updateButton = function(userIds){
+        var exists = false;
+        userIds.forEach(function(userId){
+            if(userId == $scope.user._id) exists = true;
+        });
+
+        return exists;
+    }
+
+    $scope.like = function(macro){
+        $http.put('/api/like/'+macro._id).success(function(res){
+            if(res == null) return;
+            macro.likes = res.macro.likes;
+            macro.dislikes = res.macro.dislikes;
+            macro.score = res.macro.score;
+            $scope.user .likes = res.user.likes;
+            $scope.user .dislikes = res.user.dislikes;
+        });
+    }
+
+    $scope.dislike = function(macro){
+        $http.put('/api/dislike/'+macro._id).success(function(res){
+            if(res == null) return;
+            macro.likes = res.macro.likes;
+            macro.dislikes = res.macro.dislikes;
+            macro.score = res.macro.score;
+            $scope.user .likes = res.user.likes;
+            $scope.user .dislikes = res.user.dislikes;
+        });
+    }
+
+    $scope.neutral = function(macro){
+        $http.put('/api/neutral/'+macro._id).success(function(res){
+            if(res == null) return;
+            macro.likes = res.macro.likes;
+            macro.dislikes = res.macro.dislikes;
+            macro.score = res.macro.score;
+            $scope.user .likes = res.user.likes;
+            $scope.user .dislikes = res.user.dislikes;
+        });
+    }
+}])
+
 app.controller('MainCtrl', [
 '$http',
 '$sce',
@@ -42,20 +116,20 @@ app.controller('MainCtrl', [
 function($http, $sce, $scope, macros, user){
     $scope.macros = macros.macros;
     $scope.guilds = macros.guilds;
-    $scope.displayMacros = $scope.macros;
+    $scope.displayMacros = macros.macros;
     $scope.user = user.user;
+    $scope.displayLetter="ALL";
 
-    $scope.alphabet = ["ALL","#","?","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
-    $scope.displayLetter;
-
-    $scope.sortKeys = ["Macro Names", "Usage", "Score"];
-    $scope.sortKey;
-
-    $scope.guildFilter;
-
-    $scope.currentPage = 1;
+    $scope.searchCtrl = {
+        sortKey: "name",
+        filter: ""
+    };
 
     $scope.currentTab = 0;
+
+    $scope.pagination = {
+        currentPage: 1
+    }
 
     $scope.gfycat = function(link) {
         if(link.includes("gfycat.com")) return true;
@@ -67,20 +141,10 @@ function($http, $sce, $scope, macros, user){
         return link.substring(index+1);
     }
 
-    $scope.video = function(link){
-        if(link.endsWith("mp4")) return true;
-        return false;
-    };
-
-    $scope.img = function(macro, link){
-        if(link.endsWith("mp4") || link.includes("gfycat.com")) return false;
-        return true;
-    };
-
     $scope.trustAsResourceUrl = $sce.trustAsResourceUrl;
 
     $scope.reloadGfycat = function() {
-        $scope.currentPage = 1;
+        $scope.pagination.currentPage = 1;
         gfyCollection.init();
     }
 
@@ -88,6 +152,11 @@ function($http, $sce, $scope, macros, user){
         setTimeout(function() {gfyCollection.init();}, 100);
     }
 
+    $scope.setGuild = function(index){
+        $scope.currentTab = index;
+    }
+
+    $scope.alphabet = ["ALL","#","?","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
     $scope.filterAlphabet = function(letter){
         $scope.displayLetter = letter;
         if(letter == "ALL"){
@@ -120,48 +189,7 @@ function($http, $sce, $scope, macros, user){
             });
         }
         gfyCollection.init();
-        $scope.currentPage = 1;
-    }
-
-    $scope.setSortKey = function(key){
-        var sortTerm;
-        if(key == "Macro Names") sortTerm = 'name';
-        else if(key == "Usage") sortTerm = '-usage';
-        else if(key == "Score") sortTerm = '-score';
-        $scope.sortKey = sortTerm;
-        $scope.currentPage = 1;
-    }
-
-    $scope.setGuild = function(guildId, index){
-        $scope.guildFilter = guildId;
-        $scope.currentTab = index;
-    }
-
-    $scope.updateButton = function(userIds){
-        var exists = false;
-        userIds.forEach(function(userId){
-            if(userId == $scope.user._id) exists = true;
-        });
-
-        return exists;
-    }
-
-    $scope.like = function(macro){
-        $http.put('/api/like/'+macro._id).success(function(updatedMacro){
-            if(updatedMacro == null) return;
-            macro.score = updatedMacro.score;
-            macro.likes = updatedMacro.likes;
-            macro.dislikes = updatedMacro.dislikes;
-        });
-    }
-
-    $scope.dislike = function(macro){
-        $http.put('/api/dislike/'+macro._id).success(function(updatedMacro){
-            if(updatedMacro == null) return;
-            macro.score = updatedMacro.score;
-            macro.likes = updatedMacro.likes;
-            macro.dislikes = updatedMacro.dislikes;
-        });
+        $scope.pagination.currentPage = 1;
     }
 }]);
 
