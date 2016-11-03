@@ -103,5 +103,25 @@ router.put('/neutral/:macroId', isAuthenticated, function(req, res, next){
     res.json({macro: macro, user: user});
 })
 
+router.put('/favorite/:macroId', isAuthenticated, function(req, res, next){
+    var macro = req.macro;
+    var user = req.user;
+
+    if (macro == null) return res.json(null)
+
+    user.favorite(macro._id);
+    res.json({user: user});
+})
+
+router.put('/unfavorite/:macroId', isAuthenticated, function(req, res, next){
+    var macro = req.macro;
+    var user = req.user;
+
+    if (macro == null) return res.json(null)
+
+    user.unfavorite(macro._id);
+    res.json({user: user});
+})
+
 
 module.exports = router;

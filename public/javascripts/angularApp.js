@@ -64,16 +64,27 @@ function($http, $scope){
         return true;
     };
 
-    $scope.updateButton = function(userIds){
-        var exists = false;
-        userIds.forEach(function(userId){
-            if(userId == $scope.user._id) exists = true;
-        });
-
-        return exists;
+    $scope.checkExists = function(needle, haystack){
+        if(haystack.indexOf(needle) == -1) return false;
+        else return true;
     }
 
-    $scope.like = function(macro){
+    $scope.toggleLike = function(macro){
+        if(macro.likes.indexOf($scope.user._id) == -1) like(macro);
+        else neutral(macro);
+    }
+
+    $scope.toggleDislike = function(macro){
+        if(macro.dislikes.indexOf($scope.user._id) == -1) dislike(macro);
+        else neutral(macro);
+    }
+
+    $scope.toggleFavorite = function(macro){
+        if($scope.user.favorites.indexOf(macro._id) == -1) favorite(macro);
+        else unfavorite(macro);
+    }
+
+    var like = function(macro){
         $http.put('/api/like/'+macro._id).success(function(res){
             if(res == null) return;
             macro.likes = res.macro.likes;
@@ -84,7 +95,7 @@ function($http, $scope){
         });
     }
 
-    $scope.dislike = function(macro){
+    var dislike = function(macro){
         $http.put('/api/dislike/'+macro._id).success(function(res){
             if(res == null) return;
             macro.likes = res.macro.likes;
@@ -95,7 +106,7 @@ function($http, $scope){
         });
     }
 
-    $scope.neutral = function(macro){
+    var neutral = function(macro){
         $http.put('/api/neutral/'+macro._id).success(function(res){
             if(res == null) return;
             macro.likes = res.macro.likes;
@@ -103,6 +114,20 @@ function($http, $scope){
             macro.score = res.macro.score;
             $scope.user .likes = res.user.likes;
             $scope.user .dislikes = res.user.dislikes;
+        });
+    }
+
+    var favorite = function(macro){
+        $http.put('/api/favorite/'+macro._id).success(function(res){
+            if(res == null) return;
+            $scope.user.favorites = res.user.favorites;
+        });
+    }
+
+    var unfavorite = function(macro){
+        $http.put('/api/unfavorite/'+macro._id).success(function(res){
+            if(res == null) return;
+            $scope.user.favorites = res.user.favorites;
         });
     }
 }])

@@ -9,7 +9,8 @@ var UserSchema = new mongoose.Schema({
     accessToken: String,
     refreshToken: String,
     likes: [{type: Schema.Types.ObjectId, ref: 'macro'}],
-    dislikes: [{type: Schema.Types.ObjectId, ref: 'macro'}]
+    dislikes: [{type: Schema.Types.ObjectId, ref: 'macro'}],
+    favorites: [{type: Schema.Types.ObjectId, ref: 'macro'}]
 });
 
 UserSchema.methods.like = function(_macroId){
@@ -27,6 +28,16 @@ UserSchema.methods.dislike = function(_macroId){
 UserSchema.methods.neutral = function(_macroId){
     this.dislikes.pull(_macroId);
     this.likes.pull(_macroId);
+    this.save();
+};
+
+UserSchema.methods.favorite = function(_macroId){
+    if(this.favorites.indexOf(_macroId) == -1) this.favorites.push(_macroId);
+    this.save();
+};
+
+UserSchema.methods.unfavorite = function(_macroId){
+    this.favorites.pull(_macroId);
     this.save();
 };
 
