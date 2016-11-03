@@ -30,6 +30,7 @@ var config = function (msg, command, tags) {
                 link: link,
                 score: 0,
                 usage: 0,
+                dateCreated: Date.now()
             }).
             then(function(newMacro){
                 msg.channel.sendMessage(name+" "+number+"\n"+link);

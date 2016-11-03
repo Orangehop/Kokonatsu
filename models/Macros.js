@@ -9,7 +9,8 @@ var MacroSchema = new mongoose.Schema({
     score: Number,
     usage: Number,
     likes: [{type: Schema.Types.ObjectId, ref: 'user'}],
-    dislikes: [{type: Schema.Types.ObjectId, ref: 'user'}]
+    dislikes: [{type: Schema.Types.ObjectId, ref: 'user'}],
+    dateCreated: Number,
 });
 
 MacroSchema.methods.like = function(_userId){
