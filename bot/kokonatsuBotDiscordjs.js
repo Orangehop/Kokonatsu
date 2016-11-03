@@ -27,7 +27,7 @@ bot.on('ready', () => {
 bot.login(process.env.BOTTOKEN);
 
 var checkPrefix = function(msg){
-    var macroPrefix = process.env.PREFIX;
+    var macroPrefix = process.env.MACROPREFIX;
     var configPrefix = process.env.CONFIGPREFIX;
     var prefix = msg.slice(0, macroPrefix.length).toLowerCase();
     if(prefix == macroPrefix) return 2
