@@ -70,12 +70,12 @@ function($http, $scope){
     }
 
     $scope.toggleLike = function(macro){
-        if(macro.likes.indexOf($scope.user._id) == -1) like(macro);
+        if($scope.user.likes.indexOf(macro._id) == -1) like(macro);
         else neutral(macro);
     }
 
     $scope.toggleDislike = function(macro){
-        if(macro.dislikes.indexOf($scope.user._id) == -1) dislike(macro);
+        if($scope.user.dislikes.indexOf(macro._id) == -1) dislike(macro);
         else neutral(macro);
     }
 
@@ -87,8 +87,6 @@ function($http, $scope){
     var like = function(macro){
         $http.put('/api/like/'+macro._id).success(function(res){
             if(res == null) return;
-            macro.likes = res.macro.likes;
-            macro.dislikes = res.macro.dislikes;
             macro.score = res.macro.score;
             $scope.user .likes = res.user.likes;
             $scope.user .dislikes = res.user.dislikes;
@@ -98,8 +96,6 @@ function($http, $scope){
     var dislike = function(macro){
         $http.put('/api/dislike/'+macro._id).success(function(res){
             if(res == null) return;
-            macro.likes = res.macro.likes;
-            macro.dislikes = res.macro.dislikes;
             macro.score = res.macro.score;
             $scope.user .likes = res.user.likes;
             $scope.user .dislikes = res.user.dislikes;
@@ -109,8 +105,6 @@ function($http, $scope){
     var neutral = function(macro){
         $http.put('/api/neutral/'+macro._id).success(function(res){
             if(res == null) return;
-            macro.likes = res.macro.likes;
-            macro.dislikes = res.macro.dislikes;
             macro.score = res.macro.score;
             $scope.user .likes = res.user.likes;
             $scope.user .dislikes = res.user.dislikes;

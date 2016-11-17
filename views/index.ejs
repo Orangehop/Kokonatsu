@@ -73,10 +73,10 @@
             </a>
           </div>
           <div>
-            <button type="button" class="btn btn-default btn-lg" style="width: 33.333%; float:left;" ng-class="{'btn-success': checkExists(user._id, macro.likes)}" ng-click="toggleLike(macro)">
+            <button type="button" class="btn btn-default btn-lg" style="width: 33.333%; float:left;" ng-class="{'btn-success': checkExists( macro._id, user.likes)}" ng-click="toggleLike(macro)">
               <span class="glyphicon glyphicon-thumbs-up"></span> Like
             </button>
-            <button type="button" class="btn btn-default btn-lg" style="width: 33.333%; float:left;" ng-class="{'btn-danger': checkExists(user._id, macro.dislikes)}" ng-click="toggleDislike(macro)">
+            <button type="button" class="btn btn-default btn-lg" style="width: 33.333%; float:left;" ng-class="{'btn-danger': checkExists(macro._id, user.dislikes)}" ng-click="toggleDislike(macro)">
               <span class="glyphicon glyphicon-thumbs-down"></span> Dislike
             </button>
             <button type="button" class="btn btn-default btn-lg" style="width: 33.333%; float:left;" ng-class="{'btn-primary': checkExists(macro._id, user.favorites)}" ng-click="toggleFavorite(macro)">

@@ -15,13 +15,13 @@ var UserSchema = new mongoose.Schema({
 
 UserSchema.methods.like = function(_macroId){
     this.dislikes.pull(_macroId);
-    if(this.likes.indexOf(_macroId) == -1) this.likes.push(_macroId);
+    this.likes.addToSet(_macroId);
     this.save();
 };
 
 UserSchema.methods.dislike = function(_macroId){
     this.likes.pull(_macroId);
-    if(this.dislikes.indexOf(_macroId) == -1) this.dislikes.push(_macroId);
+    this.dislikes.addToSet(_macroId);
     this.save();
 };
 
@@ -32,7 +32,7 @@ UserSchema.methods.neutral = function(_macroId){
 };
 
 UserSchema.methods.favorite = function(_macroId){
-    if(this.favorites.indexOf(_macroId) == -1) this.favorites.push(_macroId);
+    this.favorites.addToSet(_macroId);
     this.save();
 };
 

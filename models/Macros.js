@@ -6,57 +6,50 @@ var MacroSchema = new mongoose.Schema({
     guild: String,
     number: Number,
     link: String,
-    score: Number,
-    usage: Number,
-    likes: [{type: Schema.Types.ObjectId, ref: 'user'}],
-    dislikes: [{type: Schema.Types.ObjectId, ref: 'user'}],
-    dateCreated: Number,
+    score: {type: Number, default: 0},
+    usage: {type: Number, default: 0},
+    dateCreated: { type: Date, default: Date.now },
 });
 
-MacroSchema.methods.like = function(_userId){
-    this.dislikes.pull(_userId);
-    if(this.likes.indexOf(_userId) == -1) this.likes.push(_userId);
-    this.score = this.likes.length - this.dislikes.length;
-    return this.save();
-};
+MacroSchema.methods.inc = function(field, inc){
+    var update = {$inc: {}};
+    update.$inc[field] = inc;
+    return this.model('macro').findByIdAndUpdate(this._id, update, {new: true}).exec();
+}
 
-MacroSchema.methods.dislike = function(_userId){
-    this.likes.pull(_userId);
-    if(this.dislikes.indexOf(_userId) == -1) this.dislikes.push(_userId);
-    this.score = this.likes.length - this.dislikes.length;
-    return this.save();
-};
-
-MacroSchema.methods.neutral = function(_userId){
-    this.likes.pull(_userId);
-    this.dislikes.pull(_userId);
-    this.score = this.likes.length - this.dislikes.length;
-    return this.save();
-};
-
-MacroSchema.statics.delete = function(name, number, guildId){
-    return this.find({guild: guildId, name: name}).populate('likes dislikes').exec().
-    then(function(macros){
-        var removePromise;
-        macros.forEach(function(macro){
-            if(macro.number == number){
-                macro.likes.forEach(function(user){
-                    user.neutral(macro._id);
-                });
-                macro.dislikes.forEach(function(user){
-                    user.neutral(macro._id);
-                });
-
-                removePromise = macro.remove();
-            }
-            else if(macro.number > number){
-                macro.number--;
-                macro.save();
-            }
-        });
-
-        return removePromise;
+MacroSchema.methods.like = function(user){
+    return this.neutral(user).
+    then(function(macro){
+        return macro.inc("score", 1);
     });
+}
+
+MacroSchema.methods.dislike = function(user){
+    return this.neutral(user).
+    then(function(macro){
+        return macro.inc("score", -1);
+    });
+}
+
+MacroSchema.methods.neutral = function(user){
+    var change = 0;
+    var user
+    if(user.likes.indexOf(this._id) != -1) change = -1;
+    else if(user.dislikes.indexOf(this._id) != -1) change = 1;
+    return this.inc("score", change);
+}
+
+MacroSchema.methods.delete = function(){
+    this.model('user').update({}, {$pull: {likes: this._id, dislikes: this._id, favorites: this._id}}).exec();
+
+    this.model('macro').find({guild: this.guild, name: this.name}).
+    then(function(macros){
+        macros.forEach(function(macro){
+            if(macro.number > this.number) macro.inc("number", -1);
+        });
+    });
+
+    return this.remove();
 }
 
 mongoose.model('macro', MacroSchema);

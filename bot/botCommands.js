@@ -27,10 +27,7 @@ var config = function (msg, command, tags) {
                 name: name,
                 guild: guildId,
                 number: number,
-                link: link,
-                score: 0,
-                usage: 0,
-                dateCreated: Date.now()
+                link: link
             }).
             then(function(newMacro){
                 msg.channel.sendMessage(name+" "+number+"\n"+link);
@@ -211,9 +208,11 @@ var config = function (msg, command, tags) {
         if(tags.length > 1) macroNumber = parseInt(tags[1]);
         else macroNumber = 1;
 
-        Macro.delete(name, macroNumber, guildId).
-        then(function(deletedMacro){
-            msg.channel.sendMessage(deletedMacro.name+"("+deletedMacro.number+") has been deleted\n"+deletedMacro.link);
+        Macro.findOne({name: name, number: macroNumber, guild: guildId}).
+        then(function(macro){
+            return macro.delete();
+        }).then(function(macro){
+            msg.channel.sendMessage(macro.name+"("+macro.number+") has been deleted\n"+macro.link);
         });
     }
 
@@ -223,35 +222,34 @@ var config = function (msg, command, tags) {
         var modifier = tags[0];
         var name = tags[1];
         var number = tags[2];
-        var change = 0;
         var author = msg.author;
         var dbUser;
 
         User.findOneAndUpdate({discordId: author.id},
-                                              {username: author.username,
-                                                discriminator: author.discriminator,
-                                                avatar: author.avatar},
-                                              {upsert: true,
-                                                new: true}).
+                              {username: author.username,
+                               discriminator: author.discriminator,
+                               avatar: author.avatar},
+                              {upsert: true,
+                               new: true}).
         then(function(user){
             dbUser = user;
             return Macro.findOne({name: name, number: number, guild: guildId})
         }).
         then(function(macro){
             if(modifier == "up"){
-                macro.like(dbUser._id).
-                then(function(newMacro){msg.channel.sendMessage(macro.name+" ("+macro.number+") score has been updated to "+ macro.score);});
+                macro.like(dbUser).
+                then(function(macro){msg.channel.sendMessage(macro.name+" ("+macro.number+") score has been updated to "+ macro.score);});
                 dbUser.like(macro._id);
             }
             else if(modifier == "down"){
-                macro.dislike(dbUser._id).
-                then(function(newMacro){msg.channel.sendMessage(macro.name+" ("+macro.number+") score has been updated to "+ macro.score);});
+                macro.dislike(dbUser).
+                then(function(macro){msg.channel.sendMessage(macro.name+" ("+macro.number+") score has been updated to "+ macro.score);});
                 dbUser.dislike(macro._id);
             }
 
             else if(modifier == "neutral"){
-                macro.neutral(dbUser._id).
-                then(function(newMacro){msg.channel.sendMessage(macro.name+" ("+macro.number+") score has been updated to "+ macro.score);});
+                macro.neutral(dbUser).
+                then(function(macro){msg.channel.sendMessage(macro.name+" ("+macro.number+") score has been updated to "+ macro.score);});
                 dbUser.neutral(macro._id);
             }
         });
@@ -285,8 +283,7 @@ var macro = function (msg, name, number){
 
         if(number  < 0 || number >= macros.length) return msg.channel.sendMessage(name+' '+(number+1)+' does not exist');
         msg.channel.sendMessage(message+macros[number].link);
-        macros[number].usage = macros[number].usage + 1;
-        macros[number].save();
+        macros[number].inc("number", 1);
     });
 }
 
