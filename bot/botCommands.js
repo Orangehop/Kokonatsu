@@ -283,7 +283,7 @@ var macro = function (msg, name, number){
 
         if(number  < 0 || number >= macros.length) return msg.channel.sendMessage(name+' '+(number+1)+' does not exist');
         msg.channel.sendMessage(message+macros[number].link);
-        macros[number].inc("number", 1);
+        macros[number].inc("usage", 1);
     });
 }
 
