@@ -266,6 +266,7 @@ var config = function (msg, command, tags) {
 
 var macro = function (msg, name, number){
     let guildId = msg.channel.guild.id;
+    name = name.toLowerCase();
 
     Macro.find({guild: guildId, name: name}).sort({number: 1}).
     then(function(macros){
