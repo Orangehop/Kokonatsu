@@ -24,6 +24,10 @@ bot.on('ready', () => {
   console.log('I am ready!');
 });
 
+bot.on('disconnect', () => {
+    bot.login(process.env.BOTTOKEN);
+});
+
 bot.login(process.env.BOTTOKEN);
 
 var checkPrefix = function(msg){
