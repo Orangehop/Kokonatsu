@@ -1,18 +1,26 @@
 {
-  "name": "kokonatsu",
-  "version": "1.0.0",
+  "name": "kokonatsu-bot",
+  "version": "0.0.0",
   "engines": {
-    "node": "6.x"
+    "node": "6.0.0"
   },
   "private": true,
-  "main": "kokonatsuBotDiscordjs.js",
   "scripts": {
-    "start": "node kokonatsuBotDiscordjs.js"
+    "start": "node ./bin/www"
   },
   "dependencies": {
-    "discord.js": "^9.2.0",
-    "express": "^4.14.0",
-    "mongodb": "^2.2.10",
-    "request": "^2.74.0"
+    "body-parser": "~1.15.1",
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.2.0",
+    "discord.js": "^10.0.1",
+    "ejs": "~2.4.1",
+    "express": "~4.13.4",
+    "express-session": "*",
+    "mongoose": "^4.6.2",
+    "morgan": "~1.7.0",
+    "passport": "^0.3.2",
+    "passport-oauth": "^1.0.0",
+    "request": "*",
+    "serve-favicon": "^2.3.0"
   }
 }
